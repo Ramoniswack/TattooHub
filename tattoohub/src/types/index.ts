@@ -34,14 +34,16 @@ export interface Admin extends User {
 export interface Booking {
   id: string;
   customerId: string;
+  customerName: string;
   artistId: string;
+  artistName: string;
   date: string;
   time: string;
   duration: number;
   description: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   price: number;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export interface AuthStore {
@@ -49,6 +51,7 @@ export interface AuthStore {
   isAuthenticated: boolean;
   login: (email: string, password: string, role: User['role']) => Promise<boolean>;
   logout: () => void;
+  setUser: (user: User) => void;
   signup: (data: SignupData) => Promise<boolean>;
 }
 
