@@ -240,7 +240,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                       type="button" 
                       variant="outline" 
                       onClick={addSpecialty}
-                      className="border-slate-600 text-slate-200 hover:bg-slate-700"
+                      className="border-slate-600 text-slate-200 bg-slate-500 hover:bg-slate-700 hover:text-white"
                     >
                       Add
                     </Button>

@@ -1,33 +1,60 @@
-// Authentication store - ready for Firebase Auth implementation
-// This file will contain authentication state management
-
 import { create } from 'zustand';
+import { AuthStore, User } from '@/types';
+import { mockArtists, mockCustomers } from '@/data/mockData';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'customer' | 'artist' | 'admin';
-  avatar?: string;
-}
-
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (user: User) => void;
-  logout: () => void;
-  updateUser: (user: Partial<User>) => void;
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuthenticated: false,
-  
-  login: (user) => set({ user, isAuthenticated: true }),
-  
-  logout: () => set({ user: null, isAuthenticated: false }),
-  
-  updateUser: (userData) => set((state) => ({
-    user: state.user ? { ...state.user, ...userData } : null,
-  })),
+
+  login: async (email: string, password: string, role: User['role']) => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    let user: User | null = null;
+
+    // Check in mock data based on role
+    if (role === 'artist') {
+      user = mockArtists.find(artist => artist.email === email) || null;
+    } else if (role === 'customer') {
+      user = mockCustomers.find(customer => customer.email === email) || null;
+    } else if (role === 'admin') {
+      // Mock admin user
+      if (email === 'admin@example.com' && password === 'admin123') {
+        user = {
+          id: 'admin',
+          email: 'admin@example.com',
+          name: 'Admin User',
+          role: 'admin',
+          createdAt: new Date()
+        };
+      }
+    }
+
+    if (user) {
+      set({ user, isAuthenticated: true });
+      return true;
+    }
+
+    return false;
+  },
+
+  logout: () => {
+    set({ user: null, isAuthenticated: false });
+  },
+
+  signup: async (data) => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const newUser: User = {
+      id: Math.random().toString(36).substr(2, 9),
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      createdAt: new Date()
+    };
+
+    set({ user: newUser, isAuthenticated: true });
+    return true;
+  }
 }));

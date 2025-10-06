@@ -1,11 +1,21 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, MapPin, Clock, CircleCheck as CheckCircle, Users, Calendar, Shield } from 'lucide-react';
 import Header from '@/components/layout/Header';
+import { mockArtists } from '@/data/mockData';
 
 export default function HomePage() {
+  // Get top 3 featured artists (highest rated and approved)
+  const featuredArtists = mockArtists
+    .filter(artist => artist.approved)
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3);
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -98,99 +108,41 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Artist 1 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-slate-200 group">
-              <div className="aspect-w-16 aspect-h-10 overflow-hidden">
-                <img
-                  src="https://images.pexels.com/photos/1674752/pexels-photo-1674752.jpeg?auto=compress&cs=tinysrgb&w=600"
-                  alt="Mike Rodriguez"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-bold text-slate-900">Mike Rodriguez</h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-semibold text-slate-700">4.8</span>
+            {featuredArtists.map((artist) => (
+              <Card key={artist.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-slate-200 group">
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={artist.portfolio[0] || artist.avatar}
+                    alt={`${artist.name} portfolio`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold text-slate-900">{artist.name}</h3>
+                    <div className="flex items-center space-x-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-semibold text-slate-700">{artist.rating}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center text-slate-600 mb-3">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">New York, NY</span>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Realistic</Badge>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Portraits</Badge>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Black & Gray</Badge>
-                </div>
-                <Button className="w-full bg-slate-900 hover:bg-slate-800" asChild>
-                  <Link href="/customer/browse">View Profile</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Artist 2 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-slate-200 group">
-              <div className="aspect-w-16 aspect-h-10 overflow-hidden">
-                <img
-                  src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600"
-                  alt="Sarah Chen"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-bold text-slate-900">Sarah Chen</h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-semibold text-slate-700">4.9</span>
+                  <div className="flex items-center text-slate-600 mb-3">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{artist.location}</span>
                   </div>
-                </div>
-                <div className="flex items-center text-slate-600 mb-3">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">Los Angeles, CA</span>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Traditional</Badge>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Color Work</Badge>
-                </div>
-                <Button className="w-full bg-slate-900 hover:bg-slate-800" asChild>
-                  <Link href="/customer/browse">View Profile</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Artist 3 */}
-            <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-slate-200 group">
-              <div className="aspect-w-16 aspect-h-10 overflow-hidden">
-                <img
-                  src="https://images.pexels.com/photos/2169434/pexels-photo-2169434.jpeg?auto=compress&cs=tinysrgb&w=600"
-                  alt="Alex Thompson"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-bold text-slate-900">Alex Thompson</h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-semibold text-slate-700">4.7</span>
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {artist.specialties.slice(0, 3).map((specialty, index) => (
+                      <Badge key={index} variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        {specialty}
+                      </Badge>
+                    ))}
                   </div>
-                </div>
-                <div className="flex items-center text-slate-600 mb-3">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">Chicago, IL</span>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Minimalist</Badge>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">Fine Line</Badge>
-                </div>
-                <Button className="w-full bg-slate-900 hover:bg-slate-800" asChild>
-                  <Link href="/customer/browse">View Profile</Link>
-                </Button>
-              </CardContent>
-            </Card>
+                  <Button className="w-full bg-slate-900 hover:bg-slate-800" asChild>
+                    <Link href="/customer/browse">View Profile</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
