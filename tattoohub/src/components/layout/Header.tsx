@@ -12,17 +12,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, X, LogOut, User, Calendar, Settings } from 'lucide-react';
+import { Menu, X, LogOut, User, Calendar, Settings, UserPlus } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
+import { signOutUser } from '@/lib/firebase/auth';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      logout();
+      router.push('/');
+    }
   };
 
   const getDashboardLink = () => {
@@ -38,31 +46,41 @@ export default function Header() {
     }
   };
 
+  const getProfileLink = () => {
+    switch (user?.role) {
+      case 'customer':
+        return '/customer/profile';
+      case 'artist':
+        return '/artist/profile';
+      case 'admin':
+        return '/admin/profile';
+      default:
+        return '/';
+    }
+  };
+
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b sticky top-0 z-50">
+    <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">T</span>
+        <div className="flex justify-between items-center h-20">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-teal-600/20 group-hover:shadow-teal-600/40 transition-all duration-300 group-hover:scale-105">
+              <span className="text-white font-bold text-lg">T</span>
             </div>
-            <span className="font-bold text-xl text-slate-900">
+            <span className="font-bold text-2xl bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               TattooHub
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/customer/browse" className="text-slate-600 hover:text-teal-600 transition-colors font-medium">
+          <nav className="hidden md:flex items-center space-x-1">
+            <Link href="/customer/browse" className="px-4 py-2 rounded-lg text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-200 font-medium">
               Browse Artists
             </Link>
-            <Link href="/auth/signup?role=artist" className="text-slate-600 hover:text-teal-600 transition-colors font-medium">
+            <Link href="/auth/signup?role=artist" className="px-4 py-2 rounded-lg text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-200 font-medium">
               Become an Artist
             </Link>
           </nav>
 
-          {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <DropdownMenu>
@@ -92,11 +110,25 @@ export default function Header() {
                       <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={getProfileLink()}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Edit Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
                   {user?.role === 'customer' && (
                     <DropdownMenuItem asChild>
                       <Link href="/customer/bookings">
                         <Calendar className="mr-2 h-4 w-4" />
                         <span>My Bookings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {user?.role === 'admin' && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/add-admin">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        <span>Add Admin</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -109,17 +141,16 @@ export default function Header() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-3">
-                <Button variant="ghost" asChild className="text-slate-700 hover:text-slate-900">
+                <Button variant="ghost" asChild className="text-slate-700 hover:text-teal-600 hover:bg-teal-50 font-medium">
                   <Link href="/auth/login">Sign In</Link>
                 </Button>
-                <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white">
+                <Button asChild className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg shadow-teal-600/30 hover:shadow-teal-600/50 transition-all duration-300">
                   <Link href="/auth/signup">Get Started</Link>
                 </Button>
               </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <Button
               variant="ghost"
@@ -131,32 +162,31 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t bg-white/95 backdrop-blur-md rounded-b-2xl shadow-lg">
               <Link
                 href="/customer/browse"
-                className="block px-3 py-2 text-slate-600 hover:text-teal-600 transition-colors"
+                className="block px-3 py-2 rounded-lg text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-200 font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Browse Artists
               </Link>
               <Link
                 href="/auth/signup?role=artist"
-                className="block px-3 py-2 text-slate-600 hover:text-teal-600 transition-colors"
+                className="block px-3 py-2 rounded-lg text-slate-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-200 font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Become an Artist
               </Link>
               {!isAuthenticated && (
                 <div className="pt-4 flex flex-col space-y-2">
-                  <Button variant="ghost" asChild className="justify-start">
+                  <Button variant="ghost" asChild className="justify-start hover:bg-teal-50">
                     <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
                       Sign In
                     </Link>
                   </Button>
-                  <Button asChild className="justify-start bg-teal-600 hover:bg-teal-700">
+                  <Button asChild className="justify-start bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700">
                     <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
                       Get Started
                     </Link>

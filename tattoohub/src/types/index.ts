@@ -5,6 +5,19 @@ export interface User {
   role: 'customer' | 'artist' | 'admin';
   avatar?: string;
   createdAt: Date;
+  // Optional artist fields (for profile editing)
+  bio?: string;
+  location?: string;
+  specialties?: string[];
+  portfolio?: string[];
+  coverPhoto?: string;
+  hourlyRate?: number;
+  rating?: number;
+  totalReviews?: number;
+  availability?: {
+    [key: string]: { start: string; end: string }[];
+  };
+  approved?: boolean;
 }
 
 export interface Customer extends User {
@@ -18,6 +31,7 @@ export interface Artist extends User {
   location: string;
   specialties: string[];
   portfolio: string[];
+  coverPhoto?: string;
   rating: number;
   totalReviews: number;
   hourlyRate: number;
@@ -44,6 +58,19 @@ export interface Booking {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   price: number;
   createdAt?: Date;
+  reviewed?: boolean; // Track if customer has left a review
+}
+
+export interface Review {
+  id: string;
+  bookingId: string;
+  customerId: string;
+  customerName: string;
+  artistId: string;
+  artistName: string;
+  rating: number; // 1-5 stars
+  comment: string;
+  createdAt: Date;
 }
 
 export interface AuthStore {

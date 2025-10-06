@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "artists": {
+      ".read": "auth != null",
+      ".indexOn": ["approved"],
+      "$artistId": {
+        ".write": "auth != null"
+      }
+    },
+    "admins": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+    "bookings": {
+      ".read": "auth != null",
+      ".indexOn": ["customerId", "artistId", "status"],
+      "$bookingId": {
+        ".write": "auth != null"
+      }
+    },
+    "reviews": {
+      ".read": "auth != null",
+      ".indexOn": "artistId",
+      "$reviewId": {
+        ".write": "auth != null"
+      }
+    },
+    "users": {
+      ".read": "auth != null",
+      "$userId": {
+        ".write": "auth != null"
+      }
+    },
+    "customers": {
+      ".read": "auth != null",
+      "$customerId": {
+        ".write": "auth != null"
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ import {
   off
 } from 'firebase/database';
 import { Booking, Artist, Customer } from '@/types';
+import type { Review } from '@/types';
 
 // ============================================
 // BOOKING OPERATIONS
@@ -24,6 +25,7 @@ import { Booking, Artist, Customer } from '@/types';
  */
 export async function createBooking(bookingData: Omit<Booking, 'id'>): Promise<string> {
   try {
+    console.log('📝 Creating booking with data:', bookingData);
     const bookingsRef = ref(database, 'bookings');
     const newBookingRef = push(bookingsRef);
     
@@ -33,11 +35,16 @@ export async function createBooking(bookingData: Omit<Booking, 'id'>): Promise<s
       createdAt: new Date(),
     };
 
+    console.log('💾 Saving booking to Firebase:', booking);
     await set(newBookingRef, booking);
-    console.log('✅ Booking created:', booking.id);
+    console.log('✅ Booking created successfully with ID:', booking.id);
     return booking.id;
   } catch (error) {
     console.error('❌ Error creating booking:', error);
+    const err = error as { code?: string; message?: string };
+    if (err.code === 'PERMISSION_DENIED') {
+      console.error('🔒 Firebase rules are blocking write access to /bookings');
+    }
     throw error;
   }
 }
@@ -47,27 +54,60 @@ export async function createBooking(bookingData: Omit<Booking, 'id'>): Promise<s
  */
 export async function getBookingsByCustomer(customerId: string): Promise<Booking[]> {
   try {
+    console.log('🔍 Fetching bookings for customer:', customerId);
     const bookingsRef = ref(database, 'bookings');
-    const customerQuery = query(bookingsRef, orderByChild('customerId'), equalTo(customerId));
     
-    const snapshot = await get(customerQuery);
+    // Try indexed query first
+    try {
+      const customerQuery = query(bookingsRef, orderByChild('customerId'), equalTo(customerId));
+      const snapshot = await get(customerQuery);
+      
+      if (snapshot.exists()) {
+        const bookings: Booking[] = [];
+        snapshot.forEach((childSnapshot) => {
+          const booking = childSnapshot.val() as Booking;
+          console.log('� Found booking (indexed):', booking.id, booking);
+          bookings.push(booking);
+        });
+        
+        // Sort by date (most recent first)
+        bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        console.log(`✅ Found ${bookings.length} bookings for customer ${customerId} (indexed)`);
+        return bookings;
+      }
+    } catch (indexError) {
+      console.warn('⚠️ Indexed query failed, falling back to full scan:', indexError);
+    }
     
-    if (!snapshot.exists()) {
+    // Fallback: Get all bookings and filter client-side
+    console.log('🔄 Using fallback: getting all bookings and filtering...');
+    const allSnapshot = await get(bookingsRef);
+    
+    if (!allSnapshot.exists()) {
+      console.log('📭 No bookings found in database');
       return [];
     }
 
     const bookings: Booking[] = [];
-    snapshot.forEach((childSnapshot) => {
-      bookings.push(childSnapshot.val() as Booking);
+    allSnapshot.forEach((childSnapshot) => {
+      const booking = childSnapshot.val() as Booking;
+      if (booking.customerId === customerId) {
+        console.log('📋 Found booking (filtered):', booking.id, booking);
+        bookings.push(booking);
+      }
     });
 
     // Sort by date (most recent first)
     bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    console.log(`✅ Found ${bookings.length} bookings for customer ${customerId}`);
+    console.log(`✅ Found ${bookings.length} bookings for customer ${customerId} (filtered)`);
     return bookings;
   } catch (error) {
     console.error('❌ Error getting customer bookings:', error);
+    const err = error as { code?: string; message?: string };
+    if (err.code === 'PERMISSION_DENIED') {
+      console.error('🔒 Firebase rules are blocking read access to /bookings');
+    }
     throw error;
   }
 }
@@ -77,27 +117,60 @@ export async function getBookingsByCustomer(customerId: string): Promise<Booking
  */
 export async function getBookingsByArtist(artistId: string): Promise<Booking[]> {
   try {
+    console.log('🔍 Fetching bookings for artist:', artistId);
     const bookingsRef = ref(database, 'bookings');
-    const artistQuery = query(bookingsRef, orderByChild('artistId'), equalTo(artistId));
     
-    const snapshot = await get(artistQuery);
+    // Try indexed query first
+    try {
+      const artistQuery = query(bookingsRef, orderByChild('artistId'), equalTo(artistId));
+      const snapshot = await get(artistQuery);
+      
+      if (snapshot.exists()) {
+        const bookings: Booking[] = [];
+        snapshot.forEach((childSnapshot) => {
+          const booking = childSnapshot.val() as Booking;
+          console.log('📋 Found booking (indexed):', booking.id, booking);
+          bookings.push(booking);
+        });
+        
+        // Sort by date (most recent first)
+        bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        console.log(`✅ Found ${bookings.length} bookings for artist ${artistId} (indexed)`);
+        return bookings;
+      }
+    } catch (indexError) {
+      console.warn('⚠️ Indexed query failed, falling back to full scan:', indexError);
+    }
     
-    if (!snapshot.exists()) {
+    // Fallback: Get all bookings and filter client-side
+    console.log('🔄 Using fallback: getting all bookings and filtering...');
+    const allSnapshot = await get(bookingsRef);
+    
+    if (!allSnapshot.exists()) {
+      console.log('📭 No bookings found in database');
       return [];
     }
 
     const bookings: Booking[] = [];
-    snapshot.forEach((childSnapshot) => {
-      bookings.push(childSnapshot.val() as Booking);
+    allSnapshot.forEach((childSnapshot) => {
+      const booking = childSnapshot.val() as Booking;
+      if (booking.artistId === artistId) {
+        console.log('📋 Found booking (filtered):', booking.id, booking);
+        bookings.push(booking);
+      }
     });
 
     // Sort by date (most recent first)
     bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    console.log(`✅ Found ${bookings.length} bookings for artist ${artistId}`);
+    console.log(`✅ Found ${bookings.length} bookings for artist ${artistId} (filtered)`);
     return bookings;
   } catch (error) {
     console.error('❌ Error getting artist bookings:', error);
+    const err = error as { code?: string; message?: string };
+    if (err.code === 'PERMISSION_DENIED') {
+      console.error('🔒 Firebase rules are blocking read access to /bookings');
+    }
     throw error;
   }
 }
@@ -107,16 +180,20 @@ export async function getBookingsByArtist(artistId: string): Promise<Booking[]> 
  */
 export async function getAllBookings(): Promise<Booking[]> {
   try {
+    console.log('🔍 Fetching all bookings (admin)...');
     const bookingsRef = ref(database, 'bookings');
     const snapshot = await get(bookingsRef);
     
     if (!snapshot.exists()) {
+      console.log('📭 No bookings found in database');
       return [];
     }
 
     const bookings: Booking[] = [];
     snapshot.forEach((childSnapshot) => {
-      bookings.push(childSnapshot.val() as Booking);
+      const booking = childSnapshot.val() as Booking;
+      console.log('📋 Found booking:', booking.id, booking);
+      bookings.push(booking);
     });
 
     // Sort by date (most recent first)
@@ -126,6 +203,10 @@ export async function getAllBookings(): Promise<Booking[]> {
     return bookings;
   } catch (error) {
     console.error('❌ Error getting all bookings:', error);
+    const err = error as { code?: string; message?: string };
+    if (err.code === 'PERMISSION_DENIED') {
+      console.error('🔒 Firebase rules are blocking read access to /bookings');
+    }
     throw error;
   }
 }
@@ -193,9 +274,17 @@ export function listenToBookings(
  */
 export async function saveArtistProfile(artistId: string, artistData: Partial<Artist>): Promise<void> {
   try {
+    // Update Realtime Database
     const artistRef = ref(database, `artists/${artistId}`);
     await update(artistRef, artistData);
-    console.log(`✅ Artist ${artistId} profile updated`);
+    console.log(`✅ Artist ${artistId} profile updated in Realtime DB`);
+    
+    // Also update Firestore (for auth checks)
+    const { doc, updateDoc } = await import('firebase/firestore');
+    const { db } = await import('./config');
+    const userDocRef = doc(db, 'users', artistId);
+    await updateDoc(userDocRef, artistData as Record<string, unknown>);
+    console.log(`✅ Artist ${artistId} profile updated in Firestore`);
   } catch (error) {
     console.error('❌ Error updating artist profile:', error);
     throw error;
@@ -207,14 +296,18 @@ export async function saveArtistProfile(artistId: string, artistData: Partial<Ar
  */
 export async function getArtistById(artistId: string): Promise<Artist | null> {
   try {
+    console.log('🔍 Fetching artist with ID:', artistId);
     const artistRef = ref(database, `artists/${artistId}`);
     const snapshot = await get(artistRef);
     
     if (!snapshot.exists()) {
+      console.log('❌ Artist not found in database:', artistId);
       return null;
     }
 
-    return snapshot.val() as Artist;
+    const artistData = snapshot.val() as Artist;
+    console.log('✅ Artist found:', artistData.name);
+    return artistData;
   } catch (error) {
     console.error('❌ Error getting artist:', error);
     throw error;
@@ -269,6 +362,70 @@ export async function deleteArtist(artistId: string): Promise<void> {
     console.log(`✅ Artist ${artistId} deleted`);
   } catch (error) {
     console.error('❌ Error deleting artist:', error);
+    throw error;
+  }
+}
+
+/**
+ * Approve artist - updates approved status to true
+ */
+export async function approveArtist(artistId: string): Promise<void> {
+  try {
+    const artistRef = ref(database, `artists/${artistId}`);
+    await update(artistRef, { approved: true });
+    console.log(`✅ Artist ${artistId} approved`);
+  } catch (error) {
+    console.error('❌ Error approving artist:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get pending artists (not approved yet)
+ */
+export async function getPendingArtists(): Promise<Artist[]> {
+  try {
+    const artistsRef = ref(database, 'artists');
+    const pendingQuery = query(artistsRef, orderByChild('approved'), equalTo(false));
+    const snapshot = await get(pendingQuery);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const artists: Artist[] = [];
+    snapshot.forEach((childSnapshot) => {
+      artists.push(childSnapshot.val() as Artist);
+    });
+
+    return artists;
+  } catch (error) {
+    console.error('❌ Error getting pending artists:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get approved artists
+ */
+export async function getApprovedArtists(): Promise<Artist[]> {
+  try {
+    const artistsRef = ref(database, 'artists');
+    const approvedQuery = query(artistsRef, orderByChild('approved'), equalTo(true));
+    const snapshot = await get(approvedQuery);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const artists: Artist[] = [];
+    snapshot.forEach((childSnapshot) => {
+      artists.push(childSnapshot.val() as Artist);
+    });
+
+    return artists;
+  } catch (error) {
+    console.error('❌ Error getting approved artists:', error);
     throw error;
   }
 }
@@ -359,5 +516,126 @@ export async function deleteCustomer(customerId: string): Promise<void> {
   } catch (error) {
     console.error('❌ Error deleting customer:', error);
     throw error;
+  }
+}
+
+// ============================================
+// REVIEW OPERATIONS
+// ============================================
+
+/**
+ * Create a new review for a completed booking
+ */
+export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>): Promise<string> {
+  try {
+    console.log('📝 Creating review:', reviewData);
+    const reviewsRef = ref(database, 'reviews');
+    const newReviewRef = push(reviewsRef);
+    
+    const review: Review = {
+      ...reviewData,
+      id: newReviewRef.key || '',
+      createdAt: new Date(),
+    };
+
+    await set(newReviewRef, review);
+    console.log('✅ Review created:', review.id);
+
+    // Mark booking as reviewed
+    const bookingRef = ref(database, `bookings/${reviewData.bookingId}`);
+    await update(bookingRef, { reviewed: true });
+    console.log('✅ Booking marked as reviewed');
+
+    // Update artist's rating in background (don't block on errors)
+    updateArtistRating(reviewData.artistId).catch(err => {
+      console.warn('⚠️ Failed to update artist rating (non-critical):', err);
+    });
+    
+    return review.id;
+  } catch (error) {
+    console.error('❌ Error creating review:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all reviews for an artist
+ */
+export async function getArtistReviews(artistId: string): Promise<Review[]> {
+  try {
+    const reviewsRef = ref(database, 'reviews');
+    const artistReviewsQuery = query(reviewsRef, orderByChild('artistId'), equalTo(artistId));
+    const snapshot = await get(artistReviewsQuery);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const reviews: Review[] = [];
+    snapshot.forEach((childSnapshot) => {
+      reviews.push(childSnapshot.val() as Review);
+    });
+
+    // Sort by date (newest first)
+    reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    console.log(`✅ Found ${reviews.length} reviews for artist ${artistId}`);
+    return reviews;
+  } catch (error) {
+    console.error('❌ Error getting artist reviews:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update artist's average rating based on all reviews
+ */
+async function updateArtistRating(artistId: string): Promise<void> {
+  try {
+    const reviews = await getArtistReviews(artistId);
+    
+    if (reviews.length === 0) {
+      return;
+    }
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = Number((totalRating / reviews.length).toFixed(1));
+
+    // Update both artists and users collections
+    const artistUpdates = {
+      rating: averageRating,
+      totalReviews: reviews.length,
+    };
+
+    const artistRef = ref(database, `artists/${artistId}`);
+    await update(artistRef, artistUpdates);
+    
+    const userRef = ref(database, `users/${artistId}`);
+    await update(userRef, artistUpdates);
+
+    console.log(`✅ Updated artist ${artistId} rating: ${averageRating} (${reviews.length} reviews)`);
+  } catch (error) {
+    console.error('❌ Error updating artist rating:', error);
+    throw error;
+  }
+}
+
+/**
+ * Check if a booking has been reviewed
+ */
+export async function isBookingReviewed(bookingId: string): Promise<boolean> {
+  try {
+    const bookingRef = ref(database, `bookings/${bookingId}`);
+    const snapshot = await get(bookingRef);
+    
+    if (!snapshot.exists()) {
+      return false;
+    }
+
+    const booking = snapshot.val() as Booking;
+    return booking.reviewed === true;
+  } catch (error) {
+    console.error('❌ Error checking booking review status:', error);
+    return false;
   }
 }

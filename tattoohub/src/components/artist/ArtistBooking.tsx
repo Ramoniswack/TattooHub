@@ -1,28 +1,67 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, MapPin, MessageCircle, CircleCheck as CheckCircle, Circle as XCircle, CircleAlert as AlertCircle, Phone, Mail } from 'lucide-react';
+import { Calendar, Clock, MessageCircle, CircleCheck as CheckCircle, Circle as XCircle, CircleAlert as AlertCircle, Mail } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
-import { useAppStore } from '@/lib/stores/appStore';
+import { getBookingsByArtist, updateBookingStatus as updateFirebaseBookingStatus } from '@/lib/firebase/database';
+import { Booking } from '@/types';
 import { format, parseISO } from 'date-fns';
 
 export default function ArtistBookings() {
   const { user } = useAuthStore();
-  const { bookings, customers, updateBookingStatus } = useAppStore();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load bookings from Firebase
+  useEffect(() => {
+    const loadBookings = async () => {
+      if (!user?.id || user.role !== 'artist') return;
+      
+      try {
+        setIsLoading(true);
+        const artistBookings = await getBookingsByArtist(user.id);
+        setBookings(artistBookings);
+        console.log('✅ Artist loaded bookings from Firebase:', artistBookings.length);
+      } catch (error) {
+        console.error('❌ Error loading artist bookings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBookings();
+  }, [user?.id, user?.role]);
 
   if (!user || user.role !== 'artist') return null;
 
-  const artistBookings = bookings
-    .filter(booking => booking.artistId === user.id)
-    .sort((a, b) => new Date(a.date + ' ' + a.time).getTime() - new Date(b.date + ' ' + b.time).getTime());
-
-  const handleBookingAction = (bookingId: string, status: 'confirmed' | 'cancelled') => {
-    updateBookingStatus(bookingId, status);
+  const handleBookingAction = async (bookingId: string, status: 'confirmed' | 'cancelled' | 'completed') => {
+    try {
+      await updateFirebaseBookingStatus(bookingId, status);
+      // Reload bookings to show updated status
+      const updatedBookings = await getBookingsByArtist(user.id);
+      setBookings(updatedBookings);
+      console.log(`✅ Booking ${bookingId} status updated to ${status}`);
+    } catch (error) {
+      console.error('❌ Error updating booking status:', error);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading bookings...</p>
+      </div>
+    );
+  }
+
+  const artistBookings = bookings
+    .sort((a, b) => new Date(a.date + ' ' + a.time).getTime() - new Date(b.date + ' ' + b.time).getTime());
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -69,8 +108,9 @@ export default function ArtistBookings() {
   return (
     <div className="space-y-6">
       {artistBookings.map(booking => {
-        const customer = customers.find(c => c.id === booking.customerId);
-        if (!customer) return null;
+        // Use customer name from booking data (already saved in Firebase)
+        const customerName = booking.customerName || 'Unknown Customer';
+        const customerId = booking.customerId;
 
         return (
           <Card key={booking.id} className="overflow-hidden">
@@ -78,26 +118,19 @@ export default function ArtistBookings() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={customer.avatar} alt={customer.name} />
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-teal-500 text-white text-xl">
-                      {customer.name.charAt(0)}
+                      {customerName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                      {customer.name}
+                      {customerName}
                     </h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                       <div className="flex items-center">
                         <Mail className="h-4 w-4 mr-1" />
-                        {customer.email}
+                        Customer ID: {customerId}
                       </div>
-                      {customer.phone && (
-                        <div className="flex items-center">
-                          <Phone className="h-4 w-4 mr-1" />
-                          {customer.phone}
-                        </div>
-                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusIcon(booking.status)}
@@ -152,7 +185,7 @@ export default function ArtistBookings() {
 
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="text-sm text-gray-500">
-                  Booked on {format(new Date(booking.createdAt), 'PPp')}
+                  Booked on {booking.createdAt ? format(new Date(booking.createdAt), 'PPp') : 'Recently'}
                 </div>
                 
                 {booking.status === 'pending' && (
@@ -186,7 +219,7 @@ export default function ArtistBookings() {
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => updateBookingStatus(booking.id, 'completed')}
+                      onClick={() => handleBookingAction(booking.id, 'completed')}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       Mark Complete

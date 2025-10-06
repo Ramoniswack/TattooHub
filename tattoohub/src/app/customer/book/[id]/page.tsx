@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, CalendarDays, Clock, DollarSign } from 'lucide-react';
-import { useAppStore } from '@/lib/stores/appStore';
 import { useAuthStore } from '@/lib/stores/authStore';
+import { getArtistById, createBooking } from '@/lib/firebase/database';
+import { Artist } from '@/types';
 import Header from '@/components/layout/Header';
 import { format } from 'date-fns';
 
@@ -21,16 +22,46 @@ export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
   const artistId = params.id as string;
-  const { artists, addBooking } = useAppStore();
   const { user, isAuthenticated } = useAuthStore();
   
+  const [artist, setArtist] = useState<Artist | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
   const [duration, setDuration] = useState('2');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const artist = artists.find(a => a.id === artistId);
+  useEffect(() => {
+    const loadArtist = async () => {
+      try {
+        setLoading(true);
+        const fetchedArtist = await getArtistById(artistId);
+        setArtist(fetchedArtist);
+      } catch (error) {
+        console.error('Error loading artist:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (artistId) {
+      loadArtist();
+    }
+  }, [artistId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!artist) {
     return (
@@ -55,11 +86,33 @@ export default function BookingPage() {
 
   // Generate available time slots based on artist's availability
   const getAvailableTimeSlots = (date: Date) => {
+    if (!artist.availability) {
+      // Fallback: Generate default time slots if no availability is set
+      console.log('⚠️ No availability set, using default slots');
+      const slots: string[] = [];
+      for (let hour = 9; hour <= 17; hour++) {
+        slots.push(`${hour.toString().padStart(2, '0')}:00`);
+        if (hour < 17) {
+          slots.push(`${hour.toString().padStart(2, '0')}:30`);
+        }
+      }
+      return slots;
+    }
+    
     const dayName = format(date, 'EEEE').toLowerCase();
     const availability = artist.availability[dayName];
     
     if (!availability || availability.length === 0) {
-      return [];
+      console.log(`⚠️ No availability for ${dayName}, using default slots`);
+      // Fallback: Generate default time slots
+      const slots: string[] = [];
+      for (let hour = 9; hour <= 17; hour++) {
+        slots.push(`${hour.toString().padStart(2, '0')}:00`);
+        if (hour < 17) {
+          slots.push(`${hour.toString().padStart(2, '0')}:30`);
+        }
+      }
+      return slots;
     }
 
     const slots: string[] = [];
@@ -78,6 +131,11 @@ export default function BookingPage() {
   const timeSlots = selectedDate ? getAvailableTimeSlots(selectedDate) : [];
   const totalPrice = parseFloat(duration) * artist.hourlyRate;
 
+  // Debug logging
+  console.log('📅 Selected Date:', selectedDate);
+  console.log('🕐 Time Slots:', timeSlots);
+  console.log('📋 Artist Availability:', artist.availability);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -86,9 +144,12 @@ export default function BookingPage() {
     setIsSubmitting(true);
 
     try {
-      addBooking({
+      // Save to Firebase Realtime Database
+      await createBooking({
         customerId: user.id,
+        customerName: user.name,
         artistId: artist.id,
+        artistName: artist.name,
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
         duration: parseFloat(duration),
@@ -97,9 +158,11 @@ export default function BookingPage() {
         price: totalPrice
       });
 
+      console.log('✅ Booking saved to Firebase!');
       router.push('/customer/bookings?success=true');
     } catch (error) {
-      console.error('Booking failed:', error);
+      console.error('❌ Booking failed:', error);
+      alert('Failed to create booking. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -141,10 +204,8 @@ export default function BookingPage() {
                         selected={selectedDate}
                         onSelect={setSelectedDate}
                         disabled={(date) => {
-                          const dayName = format(date, 'EEEE').toLowerCase();
-                          const hasAvailability = artist.availability[dayName] && 
-                                                artist.availability[dayName].length > 0;
-                          return date < new Date() || !hasAvailability;
+                          // Only disable past dates (allow booking even without availability)
+                          return date < new Date();
                         }}
                         className="mx-auto"
                       />
@@ -160,13 +221,24 @@ export default function BookingPage() {
                           <SelectValue placeholder="Choose a time slot" />
                         </SelectTrigger>
                         <SelectContent>
-                          {timeSlots.map(time => (
-                            <SelectItem key={time} value={time}>
-                              {time}
+                          {timeSlots.length > 0 ? (
+                            timeSlots.map(time => (
+                              <SelectItem key={time} value={time}>
+                                {time}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-slots" disabled>
+                              No time slots available
                             </SelectItem>
-                          ))}
+                          )}
                         </SelectContent>
                       </Select>
+                      {!artist.availability && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Default time slots (9 AM - 5 PM) - Artist will confirm availability
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -204,7 +276,7 @@ export default function BookingPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="w-full bg-teal-600 hover:bg-teal-700"
                     disabled={!selectedDate || !selectedTime || !description || isSubmitting}
                   >
                     {isSubmitting ? 'Booking...' : `Book Appointment - $${totalPrice}`}
@@ -225,7 +297,7 @@ export default function BookingPage() {
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={artist.avatar} alt={artist.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                    <AvatarFallback className="bg-gradient-to-br from-teal-500 to-cyan-600 text-white">
                       {artist.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
@@ -265,7 +337,7 @@ export default function BookingPage() {
 
                   <div className="flex items-center justify-between pt-3 border-t font-semibold text-lg">
                     <span>Total</span>
-                    <span className="text-purple-600">${totalPrice}</span>
+                    <span className="text-teal-600">${totalPrice}</span>
                   </div>
                 </div>
 

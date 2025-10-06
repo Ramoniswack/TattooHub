@@ -3,34 +3,49 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Search, Calendar, Clock, DollarSign, MessageCircle, CircleCheck as CheckCircle, Circle as XCircle, CircleAlert as AlertCircle, ArrowRight } from 'lucide-react';
-import { useAppStore } from '@/lib/stores/appStore';
+import { Search, Calendar, Clock, MessageCircle, CircleCheck as CheckCircle, Circle as XCircle, CircleAlert as AlertCircle, ArrowRight } from 'lucide-react';
+import { Booking } from '@/types';
 import { format, parseISO } from 'date-fns';
 
-export default function ManageBookings() {
-  const { bookings, artists, customers } = useAppStore();
+interface ManageBookingsProps {
+  bookings: Booking[];
+  isLoading?: boolean;
+}
+
+export default function ManageBookings({ bookings, isLoading = false }: ManageBookingsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading bookings...</p>
+      </div>
+    );
+  }
+
   const filteredBookings = bookings
     .filter(booking => {
-      const artist = artists.find(a => a.id === booking.artistId);
-      const customer = customers.find(c => c.id === booking.customerId);
-      
       const matchesSearch = 
-        artist?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.artistName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         booking.description.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a, b) => {
+      // Sort by date (booking date, not createdAt since it might be undefined)
+      const dateA = new Date(a.date + ' ' + a.time).getTime();
+      const dateB = new Date(b.date + ' ' + b.time).getTime();
+      return dateB - dateA;
+    });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -99,10 +114,9 @@ export default function ManageBookings() {
       <div className="space-y-4">
         {filteredBookings.length > 0 ? (
           filteredBookings.map(booking => {
-            const artist = artists.find(a => a.id === booking.artistId);
-            const customer = customers.find(c => c.id === booking.customerId);
-            
-            if (!artist || !customer) return null;
+            // Use artist and customer names from booking data
+            const artistName = booking.artistName || 'Unknown Artist';
+            const customerName = booking.customerName || 'Unknown Customer';
 
             return (
               <Card key={booking.id}>
@@ -126,13 +140,12 @@ export default function ManageBookings() {
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={customer.avatar} alt={customer.name} />
                         <AvatarFallback className="bg-gradient-to-br from-blue-500 to-teal-500 text-white">
-                          {customer.name.charAt(0)}
+                          {customerName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{customer.name}</div>
+                        <div className="font-medium">{customerName}</div>
                         <div className="text-sm text-gray-600">Customer</div>
                       </div>
                     </div>
@@ -141,13 +154,12 @@ export default function ManageBookings() {
 
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={artist.avatar} alt={artist.name} />
                         <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-                          {artist.name.charAt(0)}
+                          {artistName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{artist.name}</div>
+                        <div className="font-medium">{artistName}</div>
                         <div className="text-sm text-gray-600">Artist</div>
                       </div>
                     </div>
@@ -192,7 +204,7 @@ export default function ManageBookings() {
                   <div className="pt-4 border-t">
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <span>Booking ID: {booking.id}</span>
-                      <span>Created {format(new Date(booking.createdAt), 'PPp')}</span>
+                      <span>Booking for {format(parseISO(booking.date), 'PPP')}</span>
                     </div>
                   </div>
                 </CardContent>

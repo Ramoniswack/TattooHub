@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Loader as Loader2, Eye, EyeOff, X, ArrowLeftIcon } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
+import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '@/lib/firebase/auth';
+import { uploadArtistPhoto, getImagePreview, validateImageFile } from '@/lib/firebase/storage';
 import { User } from '@/types';
 
 interface AuthFormProps {
@@ -26,14 +28,65 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
   const [role, setRole] = useState<User['role']>(defaultRole);
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
+  const [hourlyRate, setHourlyRate] = useState<number>(50);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [coverPreview, setCoverPreview] = useState<string>('');
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [currentSpecialty, setCurrentSpecialty] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
   
-  const { login, signup } = useAuthStore();
+  const { setUser } = useAuthStore();
   const router = useRouter();
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid file');
+      return;
+    }
+
+    // Set file and generate preview
+    setAvatarFile(file);
+    try {
+      const preview = await getImagePreview(file);
+      setAvatarPreview(preview);
+      setError(''); // Clear any previous errors
+    } catch {
+      setError('Failed to load image preview');
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid file');
+      return;
+    }
+
+    // Set file and generate preview
+    setCoverFile(file);
+    try {
+      const preview = await getImagePreview(file);
+      setCoverPreview(preview);
+      setError(''); // Clear any previous errors
+    } catch {
+      setError('Failed to load cover image preview');
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,38 +95,107 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
 
     try {
       if (mode === 'login') {
-        const success = await login(email, password, role);
-        if (success) {
-          const dashboardRoute = 
-            role === 'admin' ? '/admin/dashboard' :
-            role === 'artist' ? '/artist/dashboard' :
-            '/customer/browse';
-          router.push(dashboardRoute);
-        } else {
-          setError('Invalid credentials. Please try again.');
-        }
+        // Firebase email/password login
+        const user = await signInWithEmail(email, password);
+        setUser(user);
+        
+        const dashboardRoute = 
+          user.role === 'admin' ? '/admin/dashboard' :
+          user.role === 'artist' ? '/artist/dashboard' :
+          '/customer/browse';
+        router.push(dashboardRoute);
       } else {
-        const success = await signup({
-          email,
-          password,
+        // Firebase email/password signup
+        // First, upload images if provided
+        setUploadingImage(true);
+        let avatarUrl = '';
+        let coverUrl = '';
+        
+        try {
+          // Generate a temporary ID for file uploads before user creation
+          const tempId = `temp_${Date.now()}`;
+          
+          if (role === 'artist' && avatarFile) {
+            console.log('📤 Uploading avatar...');
+            avatarUrl = await uploadArtistPhoto(tempId, avatarFile, 'avatar');
+            console.log('✅ Avatar uploaded:', avatarUrl);
+          }
+          
+          if (role === 'artist' && coverFile) {
+            console.log('📤 Uploading cover photo...');
+            coverUrl = await uploadArtistPhoto(tempId, coverFile, 'cover');
+            console.log('✅ Cover photo uploaded:', coverUrl);
+          }
+        } catch (uploadError) {
+          console.error('❌ Failed to upload images:', uploadError);
+          setError('Failed to upload images. Please try again.');
+          setIsLoading(false);
+          setUploadingImage(false);
+          return;
+        } finally {
+          setUploadingImage(false);
+        }
+        
+        // Now create the user account with image URLs
+        const user = await signUpWithEmail(email, password, {
           name,
           role,
           bio: role === 'artist' ? bio : undefined,
           location: role === 'artist' ? location : undefined,
-          specialties: role === 'artist' ? specialties : undefined
+          specialties: role === 'artist' ? specialties : undefined,
+          hourlyRate: role === 'artist' ? hourlyRate : undefined,
+          avatar: avatarUrl || undefined,
+          coverPhoto: coverUrl || undefined,
         });
         
-        if (success) {
-          const dashboardRoute = 
-            role === 'artist' ? '/artist/dashboard' :
-            '/customer/browse';
-          router.push(dashboardRoute);
-        } else {
-          setError('Signup failed. Please try again.');
-        }
+        setUser(user);
+        
+        const dashboardRoute = 
+          role === 'admin' ? '/admin/dashboard' :
+          role === 'artist' ? '/artist/dashboard' :
+          '/customer/browse';
+        router.push(dashboardRoute);
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      const error = err as { message?: string };
+      setError(error.message || 'An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const user = await signInWithGoogle(role);
+      
+      // Update auth store with Firebase user
+      setUser(user);
+      
+      // Check if artist needs to complete profile
+      if (user.role === 'artist') {
+        // Type guard to check if user has Artist properties
+        const artistUser = user as { bio?: string; location?: string; specialties?: string[] };
+        const needsCompletion = !artistUser.bio || !artistUser.location || !artistUser.specialties || artistUser.specialties.length === 0;
+        
+        if (needsCompletion) {
+          router.push('/artist/complete-profile');
+          return;
+        }
+      }
+      
+      // Navigate based on role
+      const dashboardRoute = 
+        user.role === 'admin' ? '/admin/dashboard' :
+        user.role === 'artist' ? '/artist/dashboard' :
+        '/customer/browse';
+      
+      router.push(dashboardRoute);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -227,6 +349,75 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="hourlyRate" className="text-slate-200">Hourly Rate ($)</Label>
+                  <Input
+                    id="hourlyRate"
+                    type="number"
+                    min="10"
+                    max="500"
+                    value={hourlyRate}
+                    onChange={(e) => setHourlyRate(parseInt(e.target.value) || 50)}
+                    placeholder="e.g., 100"
+                    className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                  />
+                  <p className="text-xs text-slate-400">
+                    Your hourly rate for tattoo sessions
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="avatar" className="text-slate-200">Profile Photo (Optional)</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <Input
+                        id="avatar"
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        onChange={handleAvatarChange}
+                        className="bg-slate-900/50 border-slate-600 text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-600 file:text-white hover:file:bg-teal-700 cursor-pointer"
+                      />
+                    </div>
+                    {avatarPreview && (
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-slate-600">
+                        <img 
+                          src={avatarPreview} 
+                          alt="Avatar Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Square profile photo. Max 5MB. Formats: JPG, PNG, WebP.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cover" className="text-slate-200">Cover Photo (Optional)</Label>
+                  <div className="space-y-2">
+                    <Input
+                      id="cover"
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleCoverChange}
+                      className="bg-slate-900/50 border-slate-600 text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-600 file:text-white hover:file:bg-teal-700 cursor-pointer"
+                    />
+                    {coverPreview && (
+                      <div className="relative w-full h-32 rounded-lg overflow-hidden border-2 border-slate-600">
+                        <img 
+                          src={coverPreview} 
+                          alt="Cover Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Wide banner image for your profile. Max 5MB. Formats: JPG, PNG, WebP.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label className="text-slate-200">Specialties</Label>
                   <div className="flex space-x-2">
                     <Input
@@ -269,6 +460,46 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {mode === 'login' ? 'Sign In' : 'Create Account'}
+            </Button>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-700" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-900 px-2 text-slate-400">Or continue with</span>
+              </div>
+            </div>
+
+            {/* Google Sign-In Button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-white hover:bg-gray-50 text-gray-900 border-slate-600"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+            >
+              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign {mode === 'login' ? 'in' : 'up'} with Google
             </Button>
 
             <div className="text-center text-sm text-slate-400">

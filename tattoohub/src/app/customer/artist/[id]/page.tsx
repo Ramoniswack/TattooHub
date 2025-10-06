@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,24 +9,62 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Star, MapPin, DollarSign, Clock, Calendar, ArrowLeft } from 'lucide-react';
-import { useAppStore } from '@/lib/stores/appStore';
+import { getArtistById } from '@/lib/firebase/database';
+import { Artist } from '@/types';
 import Header from '@/components/layout/Header';
 
 export default function ArtistDetailPage() {
   const params = useParams();
   const artistId = params.id as string;
-  const artists = useAppStore(state => state.artists);
-  const setSelectedArtist = useAppStore(state => state.setSelectedArtist);
-  
-  const artist = artists.find(a => a.id === artistId);
+  const [artist, setArtist] = useState<Artist | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
-  if (!artist) {
+  useEffect(() => {
+    const loadArtist = async () => {
+      try {
+        console.log('Loading artist with ID:', artistId);
+        setLoading(true);
+        setError('');
+        const fetchedArtist = await getArtistById(artistId);
+        console.log('Fetched artist:', fetchedArtist);
+        setArtist(fetchedArtist);
+      } catch (err) {
+        console.error('Error loading artist:', err);
+        const error = err as { message?: string };
+        setError(error.message || 'Failed to load artist');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (artistId) {
+      loadArtist();
+    }
+  }, [artistId]);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Artist not found</h2>
+            <p className="text-gray-600">Loading artist...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Artist</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <p className="text-sm text-gray-500 mb-4">Artist ID: {artistId}</p>
             <Button asChild>
               <Link href="/customer/browse">Browse Artists</Link>
             </Button>
@@ -35,10 +74,30 @@ export default function ArtistDetailPage() {
     );
   }
 
-  // Get available days
-  const availableDays = Object.keys(artist.availability).map(day => 
-    day.charAt(0).toUpperCase() + day.slice(1)
-  );
+  if (!artist) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Artist not found</h2>
+            <p className="text-gray-600 mb-4">The artist you&apos;re looking for doesn&apos;t exist in our database.</p>
+            <p className="text-sm text-gray-500 mb-4">Artist ID: {artistId}</p>
+            <Button asChild>
+              <Link href="/customer/browse">Browse Artists</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Get available days - handle missing availability
+  const availableDays = artist.availability 
+    ? Object.keys(artist.availability).map(day => 
+        day.charAt(0).toUpperCase() + day.slice(1)
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -64,7 +123,7 @@ export default function ArtistDetailPage() {
                 <div className="flex items-start space-x-4">
                   <Avatar className="h-20 w-20">
                     <AvatarImage src={artist.avatar} alt={artist.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-2xl">
+                    <AvatarFallback className="bg-gradient-to-br from-teal-500 to-cyan-600 text-white text-2xl">
                       {artist.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
@@ -91,11 +150,15 @@ export default function ArtistDetailPage() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {artist.specialties.map((specialty, index) => (
-                        <Badge key={index} variant="secondary">
-                          {specialty}
-                        </Badge>
-                      ))}
+                      {artist.specialties && artist.specialties.length > 0 ? (
+                        artist.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="secondary">
+                            {specialty}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500">No specialties listed</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -113,24 +176,26 @@ export default function ArtistDetailPage() {
             </Card>
 
             {/* Portfolio */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Portfolio</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {artist.portfolio.map((image, index) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                      <img
-                        src={image}
-                        alt={`Portfolio ${index + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {artist.portfolio && artist.portfolio.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Portfolio</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {artist.portfolio.map((image, index) => (
+                      <div key={index} className="aspect-square rounded-lg overflow-hidden">
+                        <img
+                          src={image}
+                          alt={`Portfolio ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -143,21 +208,18 @@ export default function ArtistDetailPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600 mb-1">
+                    <div className="text-2xl font-bold text-teal-600 mb-1">
                       ${artist.hourlyRate}/hour
                     </div>
                     <p className="text-sm text-gray-600">Starting rate</p>
                   </div>
                   <Separator />
                   <Button 
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="w-full bg-teal-600 hover:bg-teal-700"
                     asChild
                     disabled={!artist.approved}
                   >
-                    <Link 
-                      href={`/customer/book/${artist.id}`}
-                      onClick={() => setSelectedArtist(artist)}
-                    >
+                    <Link href={`/customer/book/${artist.id}`}>
                       Book Now
                     </Link>
                   </Button>

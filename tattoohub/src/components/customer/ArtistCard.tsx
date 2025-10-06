@@ -16,13 +16,18 @@ interface ArtistCardProps {
 
 export default function ArtistCard({ artist }: ArtistCardProps) {
   const setSelectedArtist = useAppStore(state => state.setSelectedArtist);
+  
+  // Use cover photo if available, otherwise use portfolio or avatar
+  const coverImage = artist.coverPhoto || artist.portfolio?.[0] || artist.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=0D8ABC&color=fff&size=800`;
+  const avatarImage = artist.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=0D8ABC&color=fff&size=200`;
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group border-slate-200">
-      <div className="relative h-48 overflow-hidden">
+      {/* Cover Photo/Banner */}
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
         <Image
-          src={artist.portfolio[0] || artist.avatar}
-          alt={`${artist.name} portfolio`}
+          src={coverImage}
+          alt={`${artist.name} cover`}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -31,37 +36,39 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
             Pending
           </div>
         )}
+        {/* Avatar overlay on cover */}
+        <div className="absolute -bottom-6 left-6">
+          <Avatar className="h-16 w-16 border-4 border-white shadow-lg">
+            <AvatarImage src={avatarImage} alt={artist.name} />
+            <AvatarFallback className="bg-gradient-to-br from-teal-600 to-cyan-600 text-white font-bold text-xl">
+              {artist.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={artist.avatar} alt={artist.name} />
-              <AvatarFallback className="bg-gradient-to-br from-teal-600 to-cyan-600 text-white font-bold">
-                {artist.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+      
+      <CardContent className="p-6 pt-8">
+        <div className="mb-4">
+          <div className="flex items-start justify-between">
             <div>
               <h3 className="font-bold text-lg text-slate-900">{artist.name}</h3>
-              <div className="flex items-center space-x-2 text-sm text-slate-600">
+              <div className="flex items-center space-x-3 text-sm text-slate-600 mt-1">
                 <div className="flex items-center">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                  <span className="font-semibold">{artist.rating}</span>
-                  <span className="ml-1">({artist.totalReviews})</span>
+                  <span className="font-medium">{artist.rating}</span>
+                  <span className="text-slate-400 ml-1">({artist.totalReviews})</span>
+                </div>
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  {artist.location}
                 </div>
               </div>
             </div>
+            <div className="flex items-center bg-teal-50 px-3 py-1 rounded-full">
+              <DollarSign className="h-4 w-4 text-teal-700 mr-1" />
+              <span className="font-bold text-teal-700">{artist.hourlyRate}/hr</span>
+            </div>
           </div>
-        </div>
-
-        <div className="flex items-center text-slate-600 mb-2">
-          <MapPin className="h-4 w-4 mr-2" />
-          <span className="text-sm">{artist.location}</span>
-        </div>
-
-        <div className="flex items-center text-slate-600 mb-4">
-          <DollarSign className="h-4 w-4 mr-2" />
-          <span className="text-sm font-semibold">${artist.hourlyRate}/hour</span>
         </div>
 
         <p className="text-slate-600 text-sm mb-4 line-clamp-2 leading-relaxed">

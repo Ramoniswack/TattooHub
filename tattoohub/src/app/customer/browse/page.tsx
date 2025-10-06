@@ -1,21 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, MapPin, Star } from 'lucide-react';
-import { useAppStore } from '@/lib/stores/appStore';
+import { Search, Filter, MapPin } from 'lucide-react';
+import { getApprovedArtists } from '@/lib/firebase/database';
+import { Artist } from '@/types';
 import ArtistCard from '@/components/customer/ArtistCard';
 import Header from '@/components/layout/Header';
 
 export default function BrowseArtistsPage() {
-  const artists = useAppStore(state => state.artists);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
+  const [minRating, setMinRating] = useState('all');
   const [sortBy, setSortBy] = useState('rating');
+
+  // Load artists from Firebase
+  useEffect(() => {
+    const loadArtists = async () => {
+      try {
+        setLoading(true);
+        const fetchedArtists = await getApprovedArtists();
+        setArtists(fetchedArtists);
+      } catch (error) {
+        console.error('Error loading artists:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadArtists();
+  }, []);
 
   // Get unique locations and specialties for filters
   const locations = Array.from(new Set(artists.map(artist => artist.location)));
@@ -24,15 +44,13 @@ export default function BrowseArtistsPage() {
   // Filter and sort artists
   const filteredArtists = artists
     .filter(artist => {
-      // Only show approved artists
-      if (!artist.approved) return false;
-      
       const matchesSearch = artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            artist.bio.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesLocation = locationFilter === 'all' || artist.location === locationFilter;
       const matchesSpecialty = specialtyFilter === 'all' || artist.specialties.includes(specialtyFilter);
+      const matchesRating = minRating === 'all' || artist.rating >= parseFloat(minRating);
       
-      return matchesSearch && matchesLocation && matchesSpecialty;
+      return matchesSearch && matchesLocation && matchesSpecialty && matchesRating;
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -51,8 +69,9 @@ export default function BrowseArtistsPage() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setLocationFilter('');
-    setSpecialtyFilter('');
+    setLocationFilter('all');
+    setSpecialtyFilter('all');
+    setMinRating('all');
     setSortBy('rating');
   };
 
@@ -67,9 +86,16 @@ export default function BrowseArtistsPage() {
           <p className="text-xl text-slate-600">Find the perfect tattoo artist for your next ink</p>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {loading ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+            <p className="text-slate-600 text-lg">Loading artists...</p>
+          </div>
+        ) : (
+          <>
+            {/* Filters */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             {/* Search */}
             <div className="lg:col-span-2">
               <div className="relative">
@@ -117,6 +143,22 @@ export default function BrowseArtistsPage() {
               </Select>
             </div>
 
+            {/* Minimum Rating Filter */}
+            <div>
+              <Select value={minRating} onValueChange={setMinRating}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Min Rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Ratings</SelectItem>
+                  <SelectItem value="4.5">4.5+ ⭐</SelectItem>
+                  <SelectItem value="4.0">4.0+ ⭐</SelectItem>
+                  <SelectItem value="3.5">3.5+ ⭐</SelectItem>
+                  <SelectItem value="3.0">3.0+ ⭐</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Sort */}
             <div>
               <Select value={sortBy} onValueChange={setSortBy}>
@@ -134,7 +176,7 @@ export default function BrowseArtistsPage() {
           </div>
 
           {/* Active Filters */}
-          {(searchTerm || locationFilter || specialtyFilter) && (
+          {(searchTerm || locationFilter !== 'all' || specialtyFilter !== 'all' || minRating !== 'all') && (
             <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
               <span className="text-sm text-gray-600">Active filters:</span>
               {searchTerm && (
@@ -142,15 +184,20 @@ export default function BrowseArtistsPage() {
                   Search: {searchTerm}
                 </Badge>
               )}
-              {locationFilter && (
+              {locationFilter !== 'all' && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {locationFilter}
                 </Badge>
               )}
-              {specialtyFilter && (
+              {specialtyFilter !== 'all' && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   {specialtyFilter}
+                </Badge>
+              )}
+              {minRating !== 'all' && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Rating: {minRating}+ ⭐
                 </Badge>
               )}
               <Button
@@ -192,6 +239,8 @@ export default function BrowseArtistsPage() {
               Clear filters
             </Button>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>
