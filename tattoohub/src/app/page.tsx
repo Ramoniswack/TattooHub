@@ -31,7 +31,7 @@ export default function HomePage() {
               <Button size="lg" asChild className="bg-teal-600 text-white hover:bg-teal-700 shadow-lg shadow-teal-600/30">
                 <Link href="/customer/browse">Browse Artists</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-slate-300 text-white hover:bg-white hover:text-slate-900">
+              <Button size="lg" variant="outline" asChild className="border-slate-300 text-black hover:bg-slate-300 hover:text-slate-900">
                 <Link href="/auth/signup?role=artist">Join as Artist</Link>
               </Button>
             </div>
@@ -209,7 +209,7 @@ export default function HomePage() {
             <Button size="lg" asChild className="bg-teal-600 text-white hover:bg-teal-700 shadow-lg shadow-teal-600/30">
               <Link href="/auth/signup">Sign Up Now</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-slate-300 text-white hover:bg-white hover:text-slate-900">
+            <Button size="lg" variant="outline" asChild className="border-slate-300 text-black hover:bg-slate-300 hover:text-slate-900">
               <Link href="/customer/browse">Browse Artists</Link>
             </Button>
           </div>
