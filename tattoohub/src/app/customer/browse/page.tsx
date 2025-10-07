@@ -151,10 +151,10 @@ export default function BrowseArtistsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Ratings</SelectItem>
-                  <SelectItem value="4.5">4.5+ ⭐</SelectItem>
-                  <SelectItem value="4.0">4.0+ ⭐</SelectItem>
-                  <SelectItem value="3.5">3.5+ ⭐</SelectItem>
-                  <SelectItem value="3.0">3.0+ ⭐</SelectItem>
+                  <SelectItem value="4.5">4.5+</SelectItem>
+                  <SelectItem value="4.0">4.0+</SelectItem>
+                  <SelectItem value="3.5">3.5+</SelectItem>
+                  <SelectItem value="3.0">3.0+</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -197,7 +197,7 @@ export default function BrowseArtistsPage() {
               )}
               {minRating !== 'all' && (
                 <Badge variant="secondary" className="flex items-center gap-1">
-                  Rating: {minRating}+ ⭐
+                  Rating: {minRating}+
                 </Badge>
               )}
               <Button

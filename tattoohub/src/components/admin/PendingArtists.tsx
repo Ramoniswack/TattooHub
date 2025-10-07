@@ -22,9 +22,9 @@ export default function PendingArtists() {
       setIsLoading(true);
       const artists = await getPendingArtists();
       setPendingArtists(artists);
-      console.log('✅ Loaded pending artists:', artists.length);
+      console.log('Loaded pending artists:', artists.length);
     } catch (error) {
-      console.error('❌ Error loading pending artists:', error);
+      console.error('Error loading pending artists:', error);
       toast({
         title: 'Error',
         description: 'Failed to load pending artists',
@@ -52,7 +52,7 @@ export default function PendingArtists() {
       // Refresh the list
       await loadPendingArtists();
     } catch (error) {
-      console.error('❌ Error approving artist:', error);
+      console.error('Error approving artist:', error);
       toast({
         title: 'Error',
         description: 'Failed to approve artist',

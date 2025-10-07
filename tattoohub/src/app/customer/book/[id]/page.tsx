@@ -88,7 +88,7 @@ export default function BookingPage() {
   const getAvailableTimeSlots = (date: Date) => {
     if (!artist.availability) {
       // Fallback: Generate default time slots if no availability is set
-      console.log('⚠️ No availability set, using default slots');
+      console.log('No availability set, using default slots');
       const slots: string[] = [];
       for (let hour = 9; hour <= 17; hour++) {
         slots.push(`${hour.toString().padStart(2, '0')}:00`);
@@ -103,7 +103,7 @@ export default function BookingPage() {
     const availability = artist.availability[dayName];
     
     if (!availability || availability.length === 0) {
-      console.log(`⚠️ No availability for ${dayName}, using default slots`);
+      console.log(`No availability for ${dayName}, using default slots`);
       // Fallback: Generate default time slots
       const slots: string[] = [];
       for (let hour = 9; hour <= 17; hour++) {
@@ -158,10 +158,10 @@ export default function BookingPage() {
         price: totalPrice
       });
 
-      console.log('✅ Booking saved to Firebase!');
+      console.log('Booking saved to Firebase!');
       router.push('/customer/bookings?success=true');
     } catch (error) {
-      console.error('❌ Booking failed:', error);
+      console.error('Booking failed:', error);
       alert('Failed to create booking. Please try again.');
     } finally {
       setIsSubmitting(false);

@@ -12,29 +12,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { User, MapPin, DollarSign, Clock, X, Plus, Star } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
-import { useAppStore } from '@/lib/stores/appStore';
 
 export default function ArtistProfile() {
-  const { user } = useAuthStore();
-  const { artists, updateArtistProfile } = useAppStore();
-  
-  const artist = artists.find(a => a.id === user?.id);
+  const { user, setUser } = useAuthStore();
   
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: artist?.name || '',
-    bio: artist?.bio || '',
-    location: artist?.location || '',
-    hourlyRate: artist?.hourlyRate || 100,
-    specialties: artist?.specialties || [],
-    availability: artist?.availability || {}
+    name: user?.name || '',
+    bio: user?.bio || '',
+    location: user?.location || '',
+    hourlyRate: user?.hourlyRate || 100,
+    specialties: user?.specialties || [],
+    availability: user?.availability || {}
   });
   const [currentSpecialty, setCurrentSpecialty] = useState('');
 
-  if (!user || user.role !== 'artist' || !artist) return null;
+  if (!user || user.role !== 'artist') {
+    return (
+      <Card>
+        <CardContent className="p-12 text-center">
+          <p className="text-gray-600">Please complete your artist profile to get started.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleSave = () => {
-    updateArtistProfile(user.id, profileData);
+    // Update user profile in Firebase here if needed
+    setUser({
+      ...user,
+      ...profileData
+    });
     setIsEditing(false);
   };
 
@@ -101,9 +109,9 @@ export default function ArtistProfile() {
           {/* Avatar and Basic Info */}
           <div className="flex items-center space-x-6">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={artist.avatar} alt={artist.name} />
+              <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-3xl">
-                {artist.name.charAt(0)}
+                {user.name?.charAt(0) || 'A'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -117,7 +125,7 @@ export default function ArtistProfile() {
                       onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                     />
                   ) : (
-                    <p className="text-lg font-semibold">{artist.name}</p>
+                    <p className="text-lg font-semibold">{user.name || 'Not set'}</p>
                   )}
                 </div>
                 <div>
@@ -132,7 +140,7 @@ export default function ArtistProfile() {
                   ) : (
                     <p className="flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />
-                      {artist.location}
+                      {user.location || 'Not set'}
                     </p>
                   )}
                 </div>
@@ -152,7 +160,7 @@ export default function ArtistProfile() {
                 placeholder="Tell clients about your experience and style..."
               />
             ) : (
-              <p className="text-gray-600 leading-relaxed">{artist.bio}</p>
+              <p className="text-gray-600 leading-relaxed">{user.bio || 'Not set'}</p>
             )}
           </div>
 
@@ -170,7 +178,7 @@ export default function ArtistProfile() {
             ) : (
               <p className="flex items-center text-lg font-semibold">
                 <DollarSign className="h-4 w-4 mr-1" />
-                {artist.hourlyRate}/hour
+                {user.hourlyRate || 0}/hour
               </p>
             )}
           </div>
@@ -205,7 +213,7 @@ export default function ArtistProfile() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {artist.specialties.map((specialty, index) => (
+                {(user.specialties || []).map((specialty, index) => (
                   <Badge key={index} variant="secondary">
                     {specialty}
                   </Badge>
@@ -220,17 +228,17 @@ export default function ArtistProfile() {
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
-                  <span className="text-2xl font-bold">{artist.rating}</span>
+                  <span className="text-2xl font-bold">{user.rating || 0}</span>
                 </div>
                 <p className="text-sm text-gray-600">Rating</p>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{artist.totalReviews}</div>
+                <div className="text-2xl font-bold text-blue-600">{user.totalReviews || 0}</div>
                 <p className="text-sm text-gray-600">Reviews</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {artist.approved ? 'Approved' : 'Pending'}
+                  {user.approved ? 'Approved' : 'Pending'}
                 </div>
                 <p className="text-sm text-gray-600">Status</p>
               </div>

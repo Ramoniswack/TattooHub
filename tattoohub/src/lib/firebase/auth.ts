@@ -14,8 +14,8 @@ import {
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, update } from 'firebase/database';
 import { auth, db, database } from './config';
-import { User, Artist } from '@/types';
-import { createArtist } from './database';
+import { User, Artist, Customer } from '@/types';
+import { createArtist, createCustomer } from './database';
 
 // Sign up new user
 export const signUpWithEmail = async (
@@ -45,31 +45,35 @@ export const signUpWithEmail = async (
       displayName: userData.name,
     });
 
+    // Generate default avatar if not provided
+    const defaultAvatar = userData.avatar || firebaseUser.photoURL || 
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=random&color=fff`;
+
     const userDoc: User = {
       id: firebaseUser.uid,
       email: firebaseUser.email!,
       name: userData.name,
       role: userData.role,
+      avatar: defaultAvatar,
       createdAt: new Date(),
       ...(userData.bio && { bio: userData.bio }),
       ...(userData.location && { location: userData.location }),
       ...(userData.specialties && { specialties: userData.specialties }),
-      ...(userData.avatar && { avatar: userData.avatar }),
       ...(userData.coverPhoto && { coverPhoto: userData.coverPhoto }),
     };
 
     if (userData.role === 'artist') {
-      const artistAvatar = userData.avatar || firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=0D8ABC&color=fff`;
       Object.assign(userDoc, {
         portfolio: [],
         rating: 0,
         totalReviews: 0,
         hourlyRate: userData.hourlyRate || 50,
         approved: false,
-        avatar: artistAvatar,
         ...(userData.coverPhoto && { coverPhoto: userData.coverPhoto }),
       });
     }
+
+    console.log('Creating user document:', { id: userDoc.id, role: userDoc.role, email: userDoc.email });
 
     // Save to Firestore
     await setDoc(doc(db, 'users', firebaseUser.uid), {
@@ -77,10 +81,18 @@ export const signUpWithEmail = async (
       createdAt: serverTimestamp(),
     });
 
-    // If artist, also save to Realtime Database for browse functionality
+    console.log('Firestore document created');
+
+    // Save to Realtime Database based on role
     if (userData.role === 'artist') {
+      console.log('Saving artist to Realtime DB...');
       await createArtist(userDoc as Artist);
+    } else if (userData.role === 'customer') {
+      console.log('Saving customer to Realtime DB...');
+      await createCustomer(userDoc as Customer);
     }
+
+    console.log('User creation complete:', userDoc.role);
 
     return userDoc;
   } catch (error) {
@@ -214,12 +226,12 @@ export const updateUserProfile = async (
       }
     });
 
-    console.log('📝 Updating profile...', cleanedUpdates);
+    console.log('Updating profile...', cleanedUpdates);
 
     // Update Firestore (primary database)
     const userDocRef = doc(db, 'users', userId);
     await setDoc(userDocRef, cleanedUpdates, { merge: true });
-    console.log('✅ Firestore updated');
+    console.log('Firestore updated');
 
     // Get current user role to determine if we need to update artists collection
     const userDoc = await getDoc(userDocRef);
@@ -230,7 +242,7 @@ export const updateUserProfile = async (
     // Don't await this - let it happen in background
     const userRef = ref(database, `users/${userId}`);
     update(userRef, cleanedUpdates).catch(err => {
-      console.warn('⚠️ Realtime DB update failed (non-critical):', err);
+      console.warn('Realtime DB update failed (non-critical):', err);
     });
 
     // If user is an artist, also update the artists collection
@@ -238,14 +250,14 @@ export const updateUserProfile = async (
     if (userRole === 'artist') {
       const artistRef = ref(database, `artists/${userId}`);
       update(artistRef, cleanedUpdates).catch(err => {
-        console.warn('⚠️ Artists DB update failed (non-critical):', err);
+        console.warn('Artists DB update failed (non-critical):', err);
       });
-      console.log('📸 Artist collection updated with photos');
+      console.log('Artist collection updated with photos');
     }
 
-    console.log('✅ Profile update complete');
+    console.log('Profile update complete');
   } catch (error) {
-    console.error('❌ Error updating user profile:', error);
+    console.error('Error updating user profile:', error);
     const err = error as { message?: string };
     throw new Error(err.message || 'Failed to update profile');
   }

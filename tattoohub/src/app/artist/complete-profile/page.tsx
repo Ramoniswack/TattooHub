@@ -85,7 +85,7 @@ export default function CompleteProfilePage() {
         hourlyRate,
       });
 
-      console.log('✅ Profile completed successfully');
+      console.log('Profile completed successfully');
       
       // Navigate to artist dashboard
       router.push('/artist/dashboard');

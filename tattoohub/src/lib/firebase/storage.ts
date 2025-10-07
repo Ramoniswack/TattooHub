@@ -41,26 +41,26 @@ export async function uploadArtistPhoto(
 ): Promise<string> {
   const startTime = Date.now();
   try {
-    console.log(`📤 Converting ${type} to base64, Size: ${(file.size / 1024).toFixed(2)}KB`);
+    console.log(`Converting ${type} to base64, Size: ${(file.size / 1024).toFixed(2)}KB`);
     
     // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
       throw new Error(validation.error);
     }
-    console.log('✅ Validation passed');
+    console.log('Validation passed');
 
-    console.log('🔄 Converting to base64...');
+    console.log('Converting to base64...');
     // Convert to base64
     const base64 = await getImagePreview(file);
     
     const elapsed = Date.now() - startTime;
-    console.log(`✅ Image converted to base64 in ${elapsed}ms`);
+    console.log(`Image converted to base64 in ${elapsed}ms`);
     
     return base64;
   } catch (error) {
     const elapsed = Date.now() - startTime;
-    console.error(`❌ Error converting image after ${elapsed}ms:`, error);
+    console.error(`Error converting image after ${elapsed}ms:`, error);
     throw error;
   }
 }
@@ -74,7 +74,7 @@ export async function uploadPortfolioImage(
   index: number
 ): Promise<string> {
   try {
-    console.log(`📤 Converting portfolio image ${index}, Size: ${(file.size / 1024).toFixed(2)}KB`);
+    console.log(`Converting portfolio image ${index}, Size: ${(file.size / 1024).toFixed(2)}KB`);
     
     // Validate file
     const validation = validateImageFile(file);
@@ -84,11 +84,11 @@ export async function uploadPortfolioImage(
 
     // Convert to base64
     const base64 = await getImagePreview(file);
-    console.log('✅ Portfolio image converted to base64');
+    console.log('Portfolio image converted to base64');
     
     return base64;
   } catch (error) {
-    console.error('❌ Error converting portfolio image:', error);
+    console.error('Error converting portfolio image:', error);
     throw error;
   }
 }
@@ -98,7 +98,7 @@ export async function uploadPortfolioImage(
  */
 export async function deleteImage(_imageUrl: string): Promise<void> {
   // Base64 images are stored in database, nothing to delete from storage
-  console.log('ℹ️ Base64 image, no storage deletion needed');
+  console.log('Base64 image, no storage deletion needed');
 }
 
 /**

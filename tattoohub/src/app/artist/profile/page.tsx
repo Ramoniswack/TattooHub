@@ -16,6 +16,7 @@ import { User } from '@/types';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
+import AvailabilityManager from '@/components/artist/AvailabilityManager';
 
 export default function ArtistProfilePage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function ArtistProfilePage() {
   const [hourlyRate, setHourlyRate] = useState(50);
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [specialtyInput, setSpecialtyInput] = useState('');
+  const [availability, setAvailability] = useState<{ [key: string]: { start: string; end: string }[] }>({});
   
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
@@ -41,12 +43,13 @@ export default function ArtistProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setName(user.name);
-      setEmail(user.email);
+      setName(user.name || '');
+      setEmail(user.email || '');
       setBio(user.bio || '');
       setLocation(user.location || '');
       setHourlyRate(user.hourlyRate || 50);
       setSpecialties(user.specialties || []);
+      setAvailability(user.availability || {});
       if (user.avatar) setAvatarPreview(user.avatar);
       if (user.coverPhoto) setCoverPreview(user.coverPhoto);
     }
@@ -108,7 +111,7 @@ export default function ArtistProfilePage() {
     if (!user) return;
 
     const startTime = Date.now();
-    console.log('🚀 Starting profile update...');
+    console.log('Starting profile update...');
 
     setIsLoading(true);
     setError('');
@@ -121,22 +124,22 @@ export default function ArtistProfilePage() {
 
       // Upload new photos if changed
       if (avatarFile) {
-        console.log('📤 Uploading avatar...');
+        console.log('Uploading avatar...');
         setUploadProgress('Uploading avatar...');
         const uploadStart = Date.now();
         avatarUrl = await uploadArtistPhoto(user.id, avatarFile, 'avatar');
-        console.log(`✅ Avatar uploaded in ${Date.now() - uploadStart}ms`);
+        console.log(`Avatar uploaded in ${Date.now() - uploadStart}ms`);
       }
       if (coverFile) {
-        console.log('📤 Uploading cover...');
+        console.log('Uploading cover...');
         setUploadProgress('Uploading cover photo...');
         const uploadStart = Date.now();
         coverUrl = await uploadArtistPhoto(user.id, coverFile, 'cover');
-        console.log(`✅ Cover uploaded in ${Date.now() - uploadStart}ms`);
+        console.log(`Cover uploaded in ${Date.now() - uploadStart}ms`);
       }
 
       // Prepare updates object (only include defined values)
-      console.log('💾 Saving to database...');
+      console.log('Saving to database...');
       setUploadProgress('Saving profile changes...');
       const dbStart = Date.now();
       
@@ -146,6 +149,7 @@ export default function ArtistProfilePage() {
         location,
         hourlyRate,
         specialties,
+        availability,
       };
 
       // Only add photo URLs if they exist
@@ -154,7 +158,7 @@ export default function ArtistProfilePage() {
 
       // Update profile
       await updateUserProfile(user.id, updates);
-      console.log(`✅ Database updated in ${Date.now() - dbStart}ms`);
+      console.log(`Database updated in ${Date.now() - dbStart}ms`);
 
       // Update local state
       setUser({
@@ -163,14 +167,14 @@ export default function ArtistProfilePage() {
       });
 
       const totalTime = Date.now() - startTime;
-      console.log(`✅ Total profile update completed in ${totalTime}ms`);
+      console.log(`Total profile update completed in ${totalTime}ms`);
       
       setSuccess('Profile updated successfully!');
       setTimeout(() => {
         router.push('/');
       }, 1500);
     } catch (err) {
-      console.error('❌ Error updating profile:', err);
+      console.error('Error updating profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
       setIsLoading(false);
@@ -348,6 +352,12 @@ export default function ArtistProfilePage() {
                   ))}
                 </div>
               </div>
+
+              {/* Availability Manager */}
+              <AvailabilityManager
+                availability={availability}
+                onUpdate={setAvailability}
+              />
 
               {/* Error/Success Messages */}
               {error && (

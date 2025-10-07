@@ -26,9 +26,9 @@ export default function ArtistBookings() {
         setIsLoading(true);
         const artistBookings = await getBookingsByArtist(user.id);
         setBookings(artistBookings);
-        console.log('✅ Artist loaded bookings from Firebase:', artistBookings.length);
+        console.log('Artist loaded bookings from Firebase:', artistBookings.length);
       } catch (error) {
-        console.error('❌ Error loading artist bookings:', error);
+        console.error('Error loading artist bookings:', error);
       } finally {
         setIsLoading(false);
       }
@@ -45,9 +45,9 @@ export default function ArtistBookings() {
       // Reload bookings to show updated status
       const updatedBookings = await getBookingsByArtist(user.id);
       setBookings(updatedBookings);
-      console.log(`✅ Booking ${bookingId} status updated to ${status}`);
+      console.log(`Booking ${bookingId} status updated to ${status}`);
     } catch (error) {
-      console.error('❌ Error updating booking status:', error);
+      console.error('Error updating booking status:', error);
     }
   };
 

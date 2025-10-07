@@ -25,7 +25,7 @@ import type { Review } from '@/types';
  */
 export async function createBooking(bookingData: Omit<Booking, 'id'>): Promise<string> {
   try {
-    console.log('📝 Creating booking with data:', bookingData);
+    console.log('Creating booking with data:', bookingData);
     const bookingsRef = ref(database, 'bookings');
     const newBookingRef = push(bookingsRef);
     
@@ -35,12 +35,12 @@ export async function createBooking(bookingData: Omit<Booking, 'id'>): Promise<s
       createdAt: new Date(),
     };
 
-    console.log('💾 Saving booking to Firebase:', booking);
+    console.log('Saving booking to Firebase:', booking);
     await set(newBookingRef, booking);
-    console.log('✅ Booking created successfully with ID:', booking.id);
+    console.log('Booking created successfully with ID:', booking.id);
     return booking.id;
   } catch (error) {
-    console.error('❌ Error creating booking:', error);
+    console.error('Error creating booking:', error);
     const err = error as { code?: string; message?: string };
     if (err.code === 'PERMISSION_DENIED') {
       console.error('🔒 Firebase rules are blocking write access to /bookings');
@@ -72,15 +72,15 @@ export async function getBookingsByCustomer(customerId: string): Promise<Booking
         
         // Sort by date (most recent first)
         bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        console.log(`✅ Found ${bookings.length} bookings for customer ${customerId} (indexed)`);
+        console.log(`Found ${bookings.length} bookings for customer ${customerId} (indexed)`);
         return bookings;
       }
     } catch (indexError) {
-      console.warn('⚠️ Indexed query failed, falling back to full scan:', indexError);
+      console.warn('Indexed query failed, falling back to full scan:', indexError);
     }
     
     // Fallback: Get all bookings and filter client-side
-    console.log('🔄 Using fallback: getting all bookings and filtering...');
+    console.log('Using fallback: getting all bookings and filtering...');
     const allSnapshot = await get(bookingsRef);
     
     if (!allSnapshot.exists()) {
@@ -100,10 +100,10 @@ export async function getBookingsByCustomer(customerId: string): Promise<Booking
     // Sort by date (most recent first)
     bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    console.log(`✅ Found ${bookings.length} bookings for customer ${customerId} (filtered)`);
+    console.log(`Found ${bookings.length} bookings for customer ${customerId} (filtered)`);
     return bookings;
   } catch (error) {
-    console.error('❌ Error getting customer bookings:', error);
+    console.error('Error getting customer bookings:', error);
     const err = error as { code?: string; message?: string };
     if (err.code === 'PERMISSION_DENIED') {
       console.error('🔒 Firebase rules are blocking read access to /bookings');
@@ -135,15 +135,15 @@ export async function getBookingsByArtist(artistId: string): Promise<Booking[]> 
         
         // Sort by date (most recent first)
         bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        console.log(`✅ Found ${bookings.length} bookings for artist ${artistId} (indexed)`);
+        console.log(`Found ${bookings.length} bookings for artist ${artistId} (indexed)`);
         return bookings;
       }
     } catch (indexError) {
-      console.warn('⚠️ Indexed query failed, falling back to full scan:', indexError);
+      console.warn('Indexed query failed, falling back to full scan:', indexError);
     }
     
     // Fallback: Get all bookings and filter client-side
-    console.log('🔄 Using fallback: getting all bookings and filtering...');
+    console.log('Using fallback: getting all bookings and filtering...');
     const allSnapshot = await get(bookingsRef);
     
     if (!allSnapshot.exists()) {
@@ -163,10 +163,10 @@ export async function getBookingsByArtist(artistId: string): Promise<Booking[]> 
     // Sort by date (most recent first)
     bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    console.log(`✅ Found ${bookings.length} bookings for artist ${artistId} (filtered)`);
+    console.log(`Found ${bookings.length} bookings for artist ${artistId} (filtered)`);
     return bookings;
   } catch (error) {
-    console.error('❌ Error getting artist bookings:', error);
+    console.error('Error getting artist bookings:', error);
     const err = error as { code?: string; message?: string };
     if (err.code === 'PERMISSION_DENIED') {
       console.error('🔒 Firebase rules are blocking read access to /bookings');
@@ -199,10 +199,10 @@ export async function getAllBookings(): Promise<Booking[]> {
     // Sort by date (most recent first)
     bookings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    console.log(`✅ Found ${bookings.length} total bookings`);
+    console.log(`Found ${bookings.length} total bookings`);
     return bookings;
   } catch (error) {
-    console.error('❌ Error getting all bookings:', error);
+    console.error('Error getting all bookings:', error);
     const err = error as { code?: string; message?: string };
     if (err.code === 'PERMISSION_DENIED') {
       console.error('🔒 Firebase rules are blocking read access to /bookings');
@@ -221,9 +221,9 @@ export async function updateBookingStatus(
   try {
     const bookingRef = ref(database, `bookings/${bookingId}`);
     await update(bookingRef, { status });
-    console.log(`✅ Booking ${bookingId} status updated to ${status}`);
+    console.log(`Booking ${bookingId} status updated to ${status}`);
   } catch (error) {
-    console.error('❌ Error updating booking status:', error);
+    console.error('Error updating booking status:', error);
     throw error;
   }
 }
@@ -235,9 +235,9 @@ export async function deleteBooking(bookingId: string): Promise<void> {
   try {
     const bookingRef = ref(database, `bookings/${bookingId}`);
     await remove(bookingRef);
-    console.log(`✅ Booking ${bookingId} deleted`);
+    console.log(`Booking ${bookingId} deleted`);
   } catch (error) {
-    console.error('❌ Error deleting booking:', error);
+    console.error('Error deleting booking:', error);
     throw error;
   }
 }
@@ -277,16 +277,16 @@ export async function saveArtistProfile(artistId: string, artistData: Partial<Ar
     // Update Realtime Database
     const artistRef = ref(database, `artists/${artistId}`);
     await update(artistRef, artistData);
-    console.log(`✅ Artist ${artistId} profile updated in Realtime DB`);
+    console.log(`Artist ${artistId} profile updated in Realtime DB`);
     
     // Also update Firestore (for auth checks)
     const { doc, updateDoc } = await import('firebase/firestore');
     const { db } = await import('./config');
     const userDocRef = doc(db, 'users', artistId);
     await updateDoc(userDocRef, artistData as Record<string, unknown>);
-    console.log(`✅ Artist ${artistId} profile updated in Firestore`);
+    console.log(`Artist ${artistId} profile updated in Firestore`);
   } catch (error) {
-    console.error('❌ Error updating artist profile:', error);
+    console.error('Error updating artist profile:', error);
     throw error;
   }
 }
@@ -301,15 +301,15 @@ export async function getArtistById(artistId: string): Promise<Artist | null> {
     const snapshot = await get(artistRef);
     
     if (!snapshot.exists()) {
-      console.log('❌ Artist not found in database:', artistId);
+      console.log('Artist not found in database:', artistId);
       return null;
     }
 
     const artistData = snapshot.val() as Artist;
-    console.log('✅ Artist found:', artistData.name);
+    console.log('Artist found:', artistData.name);
     return artistData;
   } catch (error) {
-    console.error('❌ Error getting artist:', error);
+    console.error('Error getting artist:', error);
     throw error;
   }
 }
@@ -333,7 +333,7 @@ export async function getAllArtists(): Promise<Artist[]> {
 
     return artists;
   } catch (error) {
-    console.error('❌ Error getting all artists:', error);
+    console.error('Error getting all artists:', error);
     throw error;
   }
 }
@@ -345,9 +345,9 @@ export async function createArtist(artistData: Artist): Promise<void> {
   try {
     const artistRef = ref(database, `artists/${artistData.id}`);
     await set(artistRef, artistData);
-    console.log(`✅ Artist ${artistData.id} created`);
+    console.log(`Artist ${artistData.id} created`);
   } catch (error) {
-    console.error('❌ Error creating artist:', error);
+    console.error('Error creating artist:', error);
     throw error;
   }
 }
@@ -355,13 +355,32 @@ export async function createArtist(artistData: Artist): Promise<void> {
 /**
  * Delete artist
  */
+/**
+ * Update artist profile
+ */
+export async function updateArtist(artistId: string, updates: Partial<Artist>): Promise<void> {
+  try {
+    const artistRef = ref(database, `artists/${artistId}`);
+    await update(artistRef, updates);
+    console.log(`Artist ${artistId} updated`);
+  } catch (error) {
+    console.error('Error updating artist:', error);
+    throw error;
+  }
+}
+
 export async function deleteArtist(artistId: string): Promise<void> {
   try {
     const artistRef = ref(database, `artists/${artistId}`);
     await remove(artistRef);
-    console.log(`✅ Artist ${artistId} deleted`);
+    
+    // Also delete from users node
+    const userRef = ref(database, `users/${artistId}`);
+    await remove(userRef);
+    
+    console.log(`Artist ${artistId} deleted`);
   } catch (error) {
-    console.error('❌ Error deleting artist:', error);
+    console.error('Error deleting artist:', error);
     throw error;
   }
 }
@@ -372,10 +391,36 @@ export async function deleteArtist(artistId: string): Promise<void> {
 export async function approveArtist(artistId: string): Promise<void> {
   try {
     const artistRef = ref(database, `artists/${artistId}`);
-    await update(artistRef, { approved: true });
-    console.log(`✅ Artist ${artistId} approved`);
+    const userRef = ref(database, `users/${artistId}`);
+    
+    await Promise.all([
+      update(artistRef, { approved: true }),
+      update(userRef, { approved: true })
+    ]);
+    
+    console.log(`Artist ${artistId} approved`);
   } catch (error) {
-    console.error('❌ Error approving artist:', error);
+    console.error('Error approving artist:', error);
+    throw error;
+  }
+}
+
+/**
+ * Reject artist - updates approved status to false
+ */
+export async function rejectArtist(artistId: string): Promise<void> {
+  try {
+    const artistRef = ref(database, `artists/${artistId}`);
+    const userRef = ref(database, `users/${artistId}`);
+    
+    await Promise.all([
+      update(artistRef, { approved: false }),
+      update(userRef, { approved: false })
+    ]);
+    
+    console.log(`Artist ${artistId} rejected`);
+  } catch (error) {
+    console.error('Error rejecting artist:', error);
     throw error;
   }
 }
@@ -400,7 +445,7 @@ export async function getPendingArtists(): Promise<Artist[]> {
 
     return artists;
   } catch (error) {
-    console.error('❌ Error getting pending artists:', error);
+    console.error('Error getting pending artists:', error);
     throw error;
   }
 }
@@ -425,7 +470,7 @@ export async function getApprovedArtists(): Promise<Artist[]> {
 
     return artists;
   } catch (error) {
-    console.error('❌ Error getting approved artists:', error);
+    console.error('Error getting approved artists:', error);
     throw error;
   }
 }
@@ -441,9 +486,9 @@ export async function saveCustomerProfile(customerId: string, customerData: Part
   try {
     const customerRef = ref(database, `customers/${customerId}`);
     await update(customerRef, customerData);
-    console.log(`✅ Customer ${customerId} profile updated`);
+    console.log(`Customer ${customerId} profile updated`);
   } catch (error) {
-    console.error('❌ Error updating customer profile:', error);
+    console.error('Error updating customer profile:', error);
     throw error;
   }
 }
@@ -462,7 +507,7 @@ export async function getCustomerById(customerId: string): Promise<Customer | nu
 
     return snapshot.val() as Customer;
   } catch (error) {
-    console.error('❌ Error getting customer:', error);
+    console.error('Error getting customer:', error);
     throw error;
   }
 }
@@ -472,21 +517,28 @@ export async function getCustomerById(customerId: string): Promise<Customer | nu
  */
 export async function getAllCustomers(): Promise<Customer[]> {
   try {
+    console.log('[getAllCustomers] Fetching customers from Realtime DB...');
     const customersRef = ref(database, 'customers');
     const snapshot = await get(customersRef);
     
+    console.log('[getAllCustomers] Snapshot exists:', snapshot.exists());
+    
     if (!snapshot.exists()) {
+      console.log('[getAllCustomers] No customers found in database');
       return [];
     }
 
     const customers: Customer[] = [];
     snapshot.forEach((childSnapshot) => {
-      customers.push(childSnapshot.val() as Customer);
+      const customer = childSnapshot.val() as Customer;
+      console.log('[getAllCustomers] Found customer:', { id: customer.id, email: customer.email });
+      customers.push(customer);
     });
 
+    console.log('[getAllCustomers] Total customers found:', customers.length);
     return customers;
   } catch (error) {
-    console.error('❌ Error getting all customers:', error);
+    console.error('[getAllCustomers] Error getting all customers:', error);
     throw error;
   }
 }
@@ -496,11 +548,48 @@ export async function getAllCustomers(): Promise<Customer[]> {
  */
 export async function createCustomer(customerData: Customer): Promise<void> {
   try {
+    console.log('[createCustomer] Starting customer creation:', {
+      id: customerData.id,
+      email: customerData.email,
+      name: customerData.name
+    });
+    
+    // Save to both customers and users nodes
     const customerRef = ref(database, `customers/${customerData.id}`);
-    await set(customerRef, customerData);
-    console.log(`✅ Customer ${customerData.id} created`);
+    const userRef = ref(database, `users/${customerData.id}`);
+    
+    console.log('[createCustomer] Saving to paths:', {
+      customerPath: `customers/${customerData.id}`,
+      userPath: `users/${customerData.id}`
+    });
+    
+    await Promise.all([
+      set(customerRef, customerData),
+      set(userRef, customerData)
+    ]);
+    
+    console.log(`[createCustomer] Customer ${customerData.id} created successfully`);
   } catch (error) {
-    console.error('❌ Error creating customer:', error);
+    console.error('[createCustomer] Error creating customer:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update customer profile
+ */
+export async function updateCustomer(customerId: string, updates: Partial<Customer>): Promise<void> {
+  try {
+    const customerRef = ref(database, `customers/${customerId}`);
+    await update(customerRef, updates);
+    
+    // Also update in users node
+    const userRef = ref(database, `users/${customerId}`);
+    await update(userRef, updates);
+    
+    console.log(`Customer ${customerId} updated`);
+  } catch (error) {
+    console.error('Error updating customer:', error);
     throw error;
   }
 }
@@ -512,9 +601,14 @@ export async function deleteCustomer(customerId: string): Promise<void> {
   try {
     const customerRef = ref(database, `customers/${customerId}`);
     await remove(customerRef);
-    console.log(`✅ Customer ${customerId} deleted`);
+    
+    // Also delete from users node
+    const userRef = ref(database, `users/${customerId}`);
+    await remove(userRef);
+    
+    console.log(`Customer ${customerId} deleted`);
   } catch (error) {
-    console.error('❌ Error deleting customer:', error);
+    console.error('Error deleting customer:', error);
     throw error;
   }
 }
@@ -528,7 +622,7 @@ export async function deleteCustomer(customerId: string): Promise<void> {
  */
 export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>): Promise<string> {
   try {
-    console.log('📝 Creating review:', reviewData);
+    console.log('Creating review:', reviewData);
     const reviewsRef = ref(database, 'reviews');
     const newReviewRef = push(reviewsRef);
     
@@ -539,21 +633,21 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
     };
 
     await set(newReviewRef, review);
-    console.log('✅ Review created:', review.id);
+    console.log('Review created:', review.id);
 
     // Mark booking as reviewed
     const bookingRef = ref(database, `bookings/${reviewData.bookingId}`);
     await update(bookingRef, { reviewed: true });
-    console.log('✅ Booking marked as reviewed');
+    console.log('Booking marked as reviewed');
 
     // Update artist's rating in background (don't block on errors)
     updateArtistRating(reviewData.artistId).catch(err => {
-      console.warn('⚠️ Failed to update artist rating (non-critical):', err);
+      console.warn('Failed to update artist rating (non-critical):', err);
     });
     
     return review.id;
   } catch (error) {
-    console.error('❌ Error creating review:', error);
+    console.error('Error creating review:', error);
     throw error;
   }
 }
@@ -579,10 +673,10 @@ export async function getArtistReviews(artistId: string): Promise<Review[]> {
     // Sort by date (newest first)
     reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
-    console.log(`✅ Found ${reviews.length} reviews for artist ${artistId}`);
+    console.log(`Found ${reviews.length} reviews for artist ${artistId}`);
     return reviews;
   } catch (error) {
-    console.error('❌ Error getting artist reviews:', error);
+    console.error('Error getting artist reviews:', error);
     throw error;
   }
 }
@@ -613,9 +707,9 @@ async function updateArtistRating(artistId: string): Promise<void> {
     const userRef = ref(database, `users/${artistId}`);
     await update(userRef, artistUpdates);
 
-    console.log(`✅ Updated artist ${artistId} rating: ${averageRating} (${reviews.length} reviews)`);
+    console.log(`Updated artist ${artistId} rating: ${averageRating} (${reviews.length} reviews)`);
   } catch (error) {
-    console.error('❌ Error updating artist rating:', error);
+    console.error('Error updating artist rating:', error);
     throw error;
   }
 }
@@ -635,7 +729,41 @@ export async function isBookingReviewed(bookingId: string): Promise<boolean> {
     const booking = snapshot.val() as Booking;
     return booking.reviewed === true;
   } catch (error) {
-    console.error('❌ Error checking booking review status:', error);
+    console.error('Error checking booking review status:', error);
     return false;
+  }
+}
+
+/**
+ * Get all reviews made by a customer
+ */
+export async function getCustomerReviews(customerId: string): Promise<Review[]> {
+  try {
+    const reviewsRef = ref(database, 'reviews');
+    const snapshot = await get(reviewsRef);
+    
+    if (!snapshot.exists()) {
+      return [];
+    }
+
+    const reviews: Review[] = [];
+    snapshot.forEach((childSnapshot) => {
+      const review = childSnapshot.val() as Review;
+      if (review.customerId === customerId) {
+        reviews.push(review);
+      }
+    });
+
+    // Sort by date (newest first)
+    reviews.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    return reviews;
+  } catch (error) {
+    console.error('Error getting customer reviews:', error);
+    throw error;
   }
 }

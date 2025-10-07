@@ -109,7 +109,11 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
                       {review.customerName}
                     </h4>
                     <p className="text-sm text-gray-500">
-                      {format(new Date(review.createdAt), 'MMM d, yyyy')}
+                      {review.createdAt ? (
+                        typeof review.createdAt === 'string' 
+                          ? new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : format(new Date(review.createdAt), 'MMM d, yyyy')
+                      ) : 'Recent'}
                     </p>
                   </div>
                 </div>

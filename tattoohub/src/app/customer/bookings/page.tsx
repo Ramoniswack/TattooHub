@@ -15,6 +15,7 @@ import { Booking } from '@/types';
 import Header from '@/components/layout/Header';
 import { format, parseISO } from 'date-fns';
 import ReviewModal from '@/components/ReviewModal';
+import EditBookingModal from '@/components/customer/EditBookingModal';
 
 export default function BookingsPage() {
   const searchParams = useSearchParams();
@@ -24,6 +25,7 @@ export default function BookingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   
   const { user } = useAuthStore();
 
@@ -31,18 +33,18 @@ export default function BookingsPage() {
   useEffect(() => {
     const loadBookings = async () => {
       if (!user?.id) {
-        console.log('⚠️ No user ID, skipping booking load');
+        console.log('No user ID, skipping booking load');
         return;
       }
       
       try {
-        console.log('🔄 Loading bookings for customer:', user.id);
+        console.log('Loading bookings for customer:', user.id);
         setIsLoading(true);
         const bookings = await getBookingsByCustomer(user.id);
         setCustomerBookings(bookings);
-        console.log('✅ Loaded bookings from Firebase:', bookings);
+        console.log('Loaded bookings from Firebase:', bookings);
       } catch (error) {
-        console.error('❌ Error loading bookings:', error);
+        console.error('Error loading bookings:', error);
       } finally {
         setIsLoading(false);
       }
@@ -55,13 +57,13 @@ export default function BookingsPage() {
   const refreshBookings = async () => {
     if (!user?.id) return;
     try {
-      console.log('🔄 Manually refreshing bookings...');
+      console.log('Manually refreshing bookings...');
       setIsLoading(true);
       const bookings = await getBookingsByCustomer(user.id);
       setCustomerBookings(bookings);
-      console.log('✅ Bookings refreshed:', bookings);
+      console.log('Bookings refreshed:', bookings);
     } catch (error) {
-      console.error('❌ Error refreshing bookings:', error);
+      console.error('Error refreshing bookings:', error);
     } finally {
       setIsLoading(false);
     }
@@ -71,12 +73,12 @@ export default function BookingsPage() {
     const reloadBookings = async () => {
       if (!user?.id) return;
       try {
-        console.log('🔄 Reloading bookings after success...');
+        console.log('Reloading bookings after success...');
         const bookings = await getBookingsByCustomer(user.id);
         setCustomerBookings(bookings);
-        console.log('✅ Bookings reloaded:', bookings);
+        console.log('Bookings reloaded:', bookings);
       } catch (error) {
-        console.error('❌ Error reloading bookings:', error);
+        console.error('Error reloading bookings:', error);
       }
     };
 
@@ -98,9 +100,9 @@ export default function BookingsPage() {
         const bookings = await getBookingsByCustomer(user.id);
         setCustomerBookings(bookings);
       }
-      console.log('✅ Booking cancelled');
+      console.log('Booking cancelled');
     } catch (error) {
-      console.error('❌ Error cancelling booking:', error);
+      console.error('Error cancelling booking:', error);
       alert('Failed to cancel booking. Please try again.');
     }
   };
@@ -202,18 +204,6 @@ export default function BookingsPage() {
           </Button>
         </div>
 
-        {/* Review Modal */}
-        {showReviewModal && selectedBooking && (
-          <ReviewModal
-            booking={selectedBooking}
-            onClose={() => {
-              setShowReviewModal(false);
-              setSelectedBooking(null);
-            }}
-            onReviewSubmitted={refreshBookings}
-          />
-        )}
-
         {/* Bookings List */}
         {isLoading ? (
           <div className="text-center py-12">
@@ -310,14 +300,26 @@ export default function BookingsPage() {
                             View Artist
                           </Link>
                         </Button>
-                        {booking.status === 'pending' && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleCancelBooking(booking.id)}
-                          >
-                            Cancel
-                          </Button>
+                        {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleCancelBooking(booking.id)}
+                            >
+                              Cancel
+                            </Button>
+                          </>
                         )}
                         {booking.status === 'completed' && !booking.reviewed && (
                           <Button 
@@ -360,6 +362,29 @@ export default function BookingsPage() {
           </Card>
         )}
       </div>
+
+      {/* Review Modal */}
+      {showReviewModal && selectedBooking && (
+        <ReviewModal
+          booking={selectedBooking}
+          onClose={() => {
+            setShowReviewModal(false);
+            setSelectedBooking(null);
+          }}
+          onReviewSubmitted={refreshBookings}
+        />
+      )}
+
+      {/* Edit Booking Modal */}
+      <EditBookingModal
+        booking={selectedBooking}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedBooking(null);
+        }}
+        onUpdate={refreshBookings}
+      />
     </div>
   );
 }

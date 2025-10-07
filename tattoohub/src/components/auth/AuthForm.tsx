@@ -116,18 +116,18 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
           const tempId = `temp_${Date.now()}`;
           
           if (role === 'artist' && avatarFile) {
-            console.log('📤 Uploading avatar...');
+            console.log('Uploading avatar...');
             avatarUrl = await uploadArtistPhoto(tempId, avatarFile, 'avatar');
-            console.log('✅ Avatar uploaded:', avatarUrl);
+            console.log('Avatar uploaded:', avatarUrl);
           }
           
           if (role === 'artist' && coverFile) {
-            console.log('📤 Uploading cover photo...');
+            console.log('Uploading cover photo...');
             coverUrl = await uploadArtistPhoto(tempId, coverFile, 'cover');
-            console.log('✅ Cover photo uploaded:', coverUrl);
+            console.log('Cover photo uploaded:', coverUrl);
           }
         } catch (uploadError) {
-          console.error('❌ Failed to upload images:', uploadError);
+          console.error('Failed to upload images:', uploadError);
           setError('Failed to upload images. Please try again.');
           setIsLoading(false);
           setUploadingImage(false);
