@@ -323,7 +323,13 @@ export const signInWithGoogle = async (
     }
   } catch (error) {
     console.error('Error signing in with Google:', error);
-    const err = error as { message?: string };
+    const err = error as { code?: string; message?: string };
+    
+    // Don't throw error for user-cancelled actions
+    if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+      throw error; // Re-throw with original error object so component can check the code
+    }
+    
     throw new Error(err.message || 'Failed to sign in with Google');
   }
 };
