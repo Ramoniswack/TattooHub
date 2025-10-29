@@ -97,13 +97,13 @@ export default function EditBookingModal({ booking, isOpen, onClose, onUpdate }:
 
         <div className="space-y-6">
           {/* Booking Info */}
-          <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Artist:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Artist:</span>
               <span className="font-medium">{booking.artistName}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Status:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                 booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
@@ -206,23 +206,23 @@ export default function EditBookingModal({ booking, isOpen, onClose, onUpdate }:
               {/* Read-only view for completed/cancelled bookings */}
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Date:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Date:</span>
                   <span className="font-medium">{booking.date}</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Time:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Time:</span>
                   <span className="font-medium">{booking.time}</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Duration:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Duration:</span>
                   <span className="font-medium">{booking.duration} hours</span>
                 </div>
                 <div className="py-2">
-                  <span className="text-gray-600 block mb-1">Description:</span>
-                  <p className="text-gray-900">{booking.description}</p>
+                  <span className="text-gray-600 dark:text-gray-400 block mb-1">Description:</span>
+                  <p className="text-gray-900 dark:text-gray-100">{booking.description}</p>
                 </div>
                 <div className="flex items-center justify-between py-2 border-t">
-                  <span className="text-gray-600">Price:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Price:</span>
                   <span className="text-lg font-bold text-teal-600">${booking.price}</span>
                 </div>
               </div>
