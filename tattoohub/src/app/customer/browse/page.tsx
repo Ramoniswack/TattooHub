@@ -10,10 +10,12 @@ import { getApprovedArtists } from '@/lib/firebase/database';
 import { Artist } from '@/types';
 import ArtistCard from '@/components/customer/ArtistCard';
 import Header from '@/components/layout/Header';
+import { mockArtists } from '@/data/mockData';
 
 export default function BrowseArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
@@ -24,11 +26,25 @@ export default function BrowseArtistsPage() {
   useEffect(() => {
     const loadArtists = async () => {
       try {
+        console.log('Loading artists...');
         setLoading(true);
+        setError('');
         const fetchedArtists = await getApprovedArtists();
-        setArtists(fetchedArtists);
+        console.log('Fetched artists:', fetchedArtists);
+        
+        // If no artists in Firebase, use mock data
+        if (fetchedArtists.length === 0) {
+          console.log('No artists in Firebase, using mock data');
+          setArtists(mockArtists.filter(a => a.approved));
+        } else {
+          setArtists(fetchedArtists);
+        }
       } catch (error) {
         console.error('Error loading artists:', error);
+        // On error, fallback to mock data
+        console.log('Error fetching from Firebase, using mock data');
+        setArtists(mockArtists.filter(a => a.approved));
+        setError('Using demo data. Firebase connection issue.');
       } finally {
         setLoading(false);
       }
@@ -76,25 +92,30 @@ export default function BrowseArtistsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-800">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-3">Browse Artists</h1>
-          <p className="text-xl text-slate-600">Find the perfect tattoo artist for your next ink</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-gray-100 mb-3">Browse Artists</h1>
+          <p className="text-xl text-slate-600 dark:text-gray-400">Find the perfect tattoo artist for your next ink</p>
         </div>
 
         {loading ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+          <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-            <p className="text-slate-600 text-lg">Loading artists...</p>
+            <p className="text-slate-600 dark:text-gray-400 text-lg">Loading artists...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-red-200 dark:border-red-900">
+            <p className="text-red-600 dark:text-red-400 text-lg mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
           </div>
         ) : (
           <>
             {/* Filters */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-slate-200 dark:border-gray-700 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             {/* Search */}
             <div className="lg:col-span-2">
@@ -178,7 +199,7 @@ export default function BrowseArtistsPage() {
           {/* Active Filters */}
           {(searchTerm || locationFilter !== 'all' || specialtyFilter !== 'all' || minRating !== 'all') && (
             <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
-              <span className="text-sm text-gray-600">Active filters:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
               {searchTerm && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   Search: {searchTerm}
@@ -214,7 +235,7 @@ export default function BrowseArtistsPage() {
 
         {/* Results */}
         <div className="mb-8">
-          <p className="text-slate-700 font-medium text-lg">
+          <p className="text-slate-700 dark:text-gray-300 font-medium text-lg">
             Showing {filteredArtists.length} artist{filteredArtists.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -227,15 +248,15 @@ export default function BrowseArtistsPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+          <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700">
             <div className="text-slate-300 mb-4">
               <Filter className="h-16 w-16 mx-auto mb-4" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No artists found</h3>
-            <p className="text-slate-600 mb-6 text-lg">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-gray-100 mb-2">No artists found</h3>
+            <p className="text-slate-600 dark:text-gray-400 mb-6 text-lg">
               Try adjusting your filters or search terms
             </p>
-            <Button variant="outline" onClick={clearFilters} className="border-slate-300 hover:bg-slate-100">
+            <Button variant="outline" onClick={clearFilters} className="border-slate-300 dark:border-gray-600 hover:bg-slate-100 dark:bg-gray-800">
               Clear filters
             </Button>
           </div>
