@@ -22,7 +22,7 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
   const avatarImage = artist.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=0D8ABC&color=fff&size=200`;
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group border-slate-200">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group border-slate-200 dark:border-gray-700">
       {/* Cover Photo/Banner */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
         <Image
@@ -51,8 +51,8 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
         <div className="mb-4">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-bold text-lg text-slate-900">{artist.name}</h3>
-              <div className="flex items-center space-x-3 text-sm text-slate-600 mt-1">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-gray-100">{artist.name}</h3>
+              <div className="flex items-center space-x-3 text-sm text-slate-600 dark:text-gray-400 mt-1">
                 <div className="flex items-center">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                   <span className="font-medium">{artist.rating}</span>
@@ -71,18 +71,18 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
           </div>
         </div>
 
-        <p className="text-slate-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+        <p className="text-slate-600 dark:text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
           {artist.bio}
         </p>
 
         <div className="flex flex-wrap gap-2 mb-5">
           {artist.specialties.slice(0, 3).map((specialty, index) => (
-            <Badge key={index} variant="secondary" className="text-xs bg-slate-100 text-slate-700 hover:bg-slate-200">
+            <Badge key={index} variant="secondary" className="text-xs bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-gray-300 hover:bg-slate-200">
               {specialty}
             </Badge>
           ))}
           {artist.specialties.length > 3 && (
-            <Badge variant="outline" className="text-xs border-slate-300">
+            <Badge variant="outline" className="text-xs border-slate-300 dark:border-gray-600">
               +{artist.specialties.length - 3} more
             </Badge>
           )}
@@ -93,7 +93,7 @@ export default function ArtistCard({ artist }: ArtistCardProps) {
             variant="outline"
             size="sm"
             asChild
-            className="flex-1 border-slate-300 hover:bg-slate-100"
+            className="flex-1 border-slate-300 dark:border-gray-600 hover:bg-slate-100 dark:bg-gray-800"
           >
             <Link
               href={`/customer/artist/${artist.id}`}
