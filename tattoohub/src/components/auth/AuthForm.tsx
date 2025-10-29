@@ -194,7 +194,20 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
       
       router.push(dashboardRoute);
     } catch (err) {
-      const error = err as { message?: string };
+      const error = err as { code?: string; message?: string };
+      
+      // Handle popup closed by user - this is not an error, just user cancellation
+      if (error.code === 'auth/popup-closed-by-user') {
+        // Silently ignore - user intentionally closed the popup
+        return;
+      }
+      
+      // Handle other auth errors
+      if (error.code === 'auth/cancelled-popup-request') {
+        // Another popup was opened, ignore this one
+        return;
+      }
+      
       setError(error.message || 'Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -278,7 +291,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Enter your full name"
-                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                 />
               </div>
             )}
@@ -293,7 +306,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="Enter your email"
-                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
               />
             </div>
 
@@ -308,7 +321,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Enter your password"
-                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                 />
                 <Button
                   type="button"
@@ -332,7 +345,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="Tell us about your tattoo style and experience..."
-                    className="resize-none bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                    className="resize-none bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                   />
                 </div>
 
@@ -344,7 +357,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="City, State"
-                    className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                    className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                   />
                 </div>
 
@@ -358,7 +371,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                     value={hourlyRate}
                     onChange={(e) => setHourlyRate(parseInt(e.target.value) || 50)}
                     placeholder="e.g., 100"
-                    className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                    className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                   />
                   <p className="text-xs text-slate-400">
                     Your hourly rate for tattoo sessions
@@ -425,7 +438,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                       onChange={(e) => setCurrentSpecialty(e.target.value)}
                       placeholder="e.g., Realistic, Traditional"
                       onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialty())}
-                      className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                      className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                     />
                     <Button 
                       type="button" 
@@ -476,7 +489,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
             <Button
               type="button"
               variant="outline"
-              className="w-full bg-white hover:bg-gray-50 text-gray-900 border-slate-600"
+              className="w-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 border-slate-600 dark:border-gray-600"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
@@ -521,7 +534,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
             </div>
 
             {mode === 'login' && (
-              <div className="text-xs text-slate-500 space-y-1">
+              <div className="text-xs text-slate-500 dark:text-gray-500 space-y-1">
                 <div>Demo credentials:</div>
                 <div>Customer: john@example.com / password123</div>
                 <div>Artist: mike@example.com / password123</div>
