@@ -109,12 +109,12 @@ export default function BookingsPage() {
 
   if (!user || user.role !== 'customer') {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
-            <p className="text-gray-600 mb-4">Please log in as a customer to view bookings.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Access Denied</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Please log in as a customer to view bookings.</p>
             <Button asChild>
               <Link href="/auth/login">Sign In</Link>
             </Button>
@@ -163,7 +163,7 @@ export default function BookingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -183,8 +183,8 @@ export default function BookingsPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
-            <p className="text-gray-600">Track your tattoo appointments and booking history</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">My Bookings</h1>
+            <p className="text-gray-600 dark:text-gray-400">Track your tattoo appointments and booking history</p>
           </div>
           <Button 
             onClick={refreshBookings} 
@@ -208,7 +208,7 @@ export default function BookingsPage() {
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your bookings...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading your bookings...</p>
           </div>
         ) : customerBookings.length > 0 ? (
           <div className="space-y-6">
@@ -230,7 +230,7 @@ export default function BookingsPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">
                             {booking.artistName}
                           </h3>
                           <div className="flex items-center space-x-2 mb-2">
@@ -249,7 +249,7 @@ export default function BookingsPage() {
                         <div className="text-2xl font-bold text-purple-600 mb-1">
                           ${booking.price}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           {booking.duration} hours
                         </div>
                       </div>
@@ -264,14 +264,14 @@ export default function BookingsPage() {
                           <div className="font-medium">
                             {format(parseISO(booking.date), 'PPP')}
                           </div>
-                          <div className="text-sm text-gray-600">Date</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Date</div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <Clock className="h-5 w-5 text-gray-400" />
                         <div>
                           <div className="font-medium">{booking.time}</div>
-                          <div className="text-sm text-gray-600">Time</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Time</div>
                         </div>
                       </div>
                     </div>
@@ -282,7 +282,7 @@ export default function BookingsPage() {
                           <MessageCircle className="h-5 w-5 text-gray-400 mt-0.5" />
                           <div>
                             <div className="font-medium mb-1">Description</div>
-                            <p className="text-gray-600 text-sm leading-relaxed">
+                            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                               {booking.description}
                             </p>
                           </div>
@@ -351,8 +351,8 @@ export default function BookingsPage() {
           <Card>
             <CardContent className="p-12 text-center">
               <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No bookings yet</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Start your tattoo journey by browsing our talented artists
               </p>
               <Button asChild className="bg-teal-600 hover:bg-teal-700">
