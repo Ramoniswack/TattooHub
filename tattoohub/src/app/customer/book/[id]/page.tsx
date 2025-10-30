@@ -52,11 +52,11 @@ export default function BookingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading...</p>
           </div>
         </div>
       </div>
@@ -65,11 +65,11 @@ export default function BookingPage() {
 
   if (!artist) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Artist not found</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Artist not found</h2>
             <Button asChild>
               <Link href="/customer/browse">Browse Artists</Link>
             </Button>
@@ -169,7 +169,7 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -303,7 +303,7 @@ export default function BookingPage() {
                   </Avatar>
                   <div>
                     <div className="font-medium">{artist.name}</div>
-                    <div className="text-sm text-gray-600">{artist.location}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{artist.location}</div>
                   </div>
                 </div>
 
@@ -311,7 +311,7 @@ export default function BookingPage() {
                 <div className="space-y-3 pt-4 border-t">
                   {selectedDate && (
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Date</span>
+                      <span className="text-gray-600 dark:text-gray-400">Date</span>
                       <span className="font-medium">
                         {format(selectedDate, 'PPP')}
                       </span>
@@ -320,18 +320,18 @@ export default function BookingPage() {
                   
                   {selectedTime && (
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Time</span>
+                      <span className="text-gray-600 dark:text-gray-400">Time</span>
                       <span className="font-medium">{selectedTime}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Duration</span>
+                    <span className="text-gray-600 dark:text-gray-400">Duration</span>
                     <span className="font-medium">{duration} hours</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Rate</span>
+                    <span className="text-gray-600 dark:text-gray-400">Rate</span>
                     <span className="font-medium">${artist.hourlyRate}/hour</span>
                   </div>
 
