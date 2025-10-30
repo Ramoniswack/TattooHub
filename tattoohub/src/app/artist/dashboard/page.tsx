@@ -37,12 +37,12 @@ export default function ArtistDashboard() {
 
   if (!user || user.role !== 'artist') {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
-            <p className="text-gray-600 mb-4">Please log in as an artist to access the dashboard.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Access Denied</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Please log in as an artist to access the dashboard.</p>
           </div>
         </div>
       </div>
@@ -57,18 +57,18 @@ export default function ArtistDashboard() {
   const reviews = user.totalReviews || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Artist Dashboard</h1>
-          <p className="text-gray-600">Manage your profile, bookings, and schedule</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Artist Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your profile, bookings, and schedule</p>
         </div>
 
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading dashboard...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
           </div>
         ) : (
           <>
@@ -77,7 +77,7 @@ export default function ArtistDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Pending Bookings</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Bookings</p>
                       <p className="text-3xl font-bold text-yellow-600">{pending.length}</p>
                     </div>
                     <AlertCircle className="h-8 w-8 text-yellow-600" />
@@ -89,7 +89,7 @@ export default function ArtistDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Confirmed Bookings</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Confirmed Bookings</p>
                       <p className="text-3xl font-bold text-green-600">{confirmed.length}</p>
                     </div>
                     <CheckCircle className="h-8 w-8 text-green-600" />
@@ -101,7 +101,7 @@ export default function ArtistDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
                       <p className="text-3xl font-bold text-purple-600">${revenue}</p>
                       <p className="text-xs text-gray-500 mt-1">{completed.length} completed</p>
                     </div>
@@ -114,7 +114,7 @@ export default function ArtistDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Rating</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Rating</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-3xl font-bold text-yellow-500">{rating.toFixed(1)}</p>
                         <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
