@@ -45,11 +45,11 @@ export default function ArtistDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading artist...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading artist...</p>
           </div>
         </div>
       </div>
@@ -58,12 +58,12 @@ export default function ArtistDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Artist</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
             <p className="text-sm text-gray-500 mb-4">Artist ID: {artistId}</p>
             <Button asChild>
               <Link href="/customer/browse">Browse Artists</Link>
@@ -76,12 +76,12 @@ export default function ArtistDetailPage() {
 
   if (!artist) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Artist not found</h2>
-            <p className="text-gray-600 mb-4">The artist you&apos;re looking for doesn&apos;t exist in our database.</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Artist not found</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">The artist you&apos;re looking for doesn&apos;t exist in our database.</p>
             <p className="text-sm text-gray-500 mb-4">Artist ID: {artistId}</p>
             <Button asChild>
               <Link href="/customer/browse">Browse Artists</Link>
@@ -100,7 +100,7 @@ export default function ArtistDetailPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -129,12 +129,12 @@ export default function ArtistDetailPage() {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900">{artist.name}</h1>
+                      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{artist.name}</h1>
                       {!artist.approved && (
                         <Badge variant="secondary">Pending Approval</Badge>
                       )}
                     </div>
-                    <div className="flex items-center space-x-4 text-gray-600 mb-3">
+                    <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400 mb-3">
                       <div className="flex items-center">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                         <span>{artist.rating}</span>
@@ -171,7 +171,7 @@ export default function ArtistDetailPage() {
                 <CardTitle>About</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 leading-relaxed">{artist.bio}</p>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{artist.bio}</p>
               </CardContent>
             </Card>
 
@@ -211,7 +211,7 @@ export default function ArtistDetailPage() {
                     <div className="text-2xl font-bold text-teal-600 mb-1">
                       ${artist.hourlyRate}/hour
                     </div>
-                    <p className="text-sm text-gray-600">Starting rate</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Starting rate</p>
                   </div>
                   <Separator />
                   <Button 
@@ -249,7 +249,7 @@ export default function ArtistDetailPage() {
                       return (
                         <div key={day} className="flex justify-between items-center">
                           <span className="font-medium">{day}</span>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
                             {hours?.map((slot, index) => (
                               <div key={index}>
                                 {slot.start} - {slot.end}
@@ -273,7 +273,7 @@ export default function ArtistDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-600 dark:text-gray-400">
                     <MapPin className="mr-2 h-4 w-4" />
                     <span>{artist.location}</span>
                   </div>
