@@ -187,7 +187,7 @@ export default function ArtistProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -272,7 +272,7 @@ export default function ArtistProfilePage() {
                   type="email"
                   value={email}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-gray-100 dark:bg-gray-800"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Email cannot be changed
