@@ -131,7 +131,7 @@ export default function CompleteProfilePage() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tell clients about your tattoo style, experience, and what makes your work unique..."
-                className="resize-none bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 min-h-[120px]"
+                className="resize-none bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500 min-h-[120px]"
                 required
               />
             </div>
@@ -147,7 +147,7 @@ export default function CompleteProfilePage() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="City, State (e.g., Los Angeles, CA)"
-                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                 required
               />
             </div>
@@ -164,7 +164,7 @@ export default function CompleteProfilePage() {
                 step="5"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(parseInt(e.target.value) || 0)}
-                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                 required
               />
               <p className="text-xs text-slate-400">You can update this later in your profile settings</p>
@@ -186,7 +186,7 @@ export default function CompleteProfilePage() {
                       addSpecialty();
                     }
                   }}
-                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500"
+                  className="bg-slate-900/50 border-slate-600 text-slate-200 placeholder:text-slate-500 dark:text-gray-500"
                 />
                 <Button 
                   type="button" 
