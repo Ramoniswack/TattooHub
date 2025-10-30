@@ -58,7 +58,7 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
     return (
       <div className="py-8 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-        <p className="text-gray-600 mt-2">Loading reviews...</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Loading reviews...</p>
       </div>
     );
   }
@@ -69,23 +69,23 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Customer Reviews
             </h3>
             {reviews.length > 0 ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                     {averageRating}
                   </span>
                 </div>
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-400">
                   Based on {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
                 </span>
               </div>
             ) : (
-              <p className="text-gray-600">No reviews yet</p>
+              <p className="text-gray-600 dark:text-gray-400">No reviews yet</p>
             )}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
                     <User className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">
                       {review.customerName}
                     </h4>
                     <p className="text-sm text-gray-500">
@@ -120,14 +120,14 @@ export default function ReviewsList({ artistId, artistName }: ReviewsListProps) 
                 {renderStars(review.rating)}
               </div>
               
-              <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{review.comment}</p>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <Star className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">No reviews yet</p>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">No reviews yet</p>
           <p className="text-sm text-gray-500 mt-1">
             Be the first to review {artistName}!
           </p>
