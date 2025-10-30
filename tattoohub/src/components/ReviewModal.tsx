@@ -56,17 +56,17 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Leave a Review</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Leave a Review</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               How was your experience with {booking.artistName}?
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 text-2xl"
             disabled={isSubmitting}
           >
             ×
@@ -76,7 +76,7 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
         <form onSubmit={handleSubmit}>
           {/* Rating Stars */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Rating *
             </label>
             <div className="flex gap-2">
@@ -103,7 +103,7 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
               ))}
             </div>
             {rating > 0 && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {rating === 1 && 'Poor'}
                 {rating === 2 && 'Fair'}
                 {rating === 3 && 'Good'}
@@ -115,14 +115,14 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
 
           {/* Comment */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Your Review *
             </label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Share your experience with this artist..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               rows={4}
               disabled={isSubmitting}
               required
@@ -137,14 +137,14 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
           )}
 
           {/* Booking Info */}
-          <div className="mb-6 p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
+          <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               <span className="font-medium">Date:</span> {booking.date}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               <span className="font-medium">Time:</span> {booking.time}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               <span className="font-medium">Service:</span> {booking.description}
             </p>
           </div>
@@ -154,7 +154,7 @@ export default function ReviewModal({ booking, onClose, onReviewSubmitted }: Rev
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
               disabled={isSubmitting}
             >
               Cancel
