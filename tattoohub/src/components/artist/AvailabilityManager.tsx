@@ -86,11 +86,11 @@ export default function AvailabilityManager({ availability, onUpdate }: Availabi
           <Clock className="h-5 w-5" />
           Booking Availability
         </CardTitle>
-        <p className="text-sm text-gray-600">Set your available hours for each day</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Set your available hours for each day</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Add Time Slot */}
-        <div className="p-4 border rounded-lg bg-gray-50 space-y-4">
+        <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="day">Day</Label>
@@ -140,7 +140,7 @@ export default function AvailabilityManager({ availability, onUpdate }: Availabi
           <Label>Current Schedule</Label>
           {DAYS_OF_WEEK.map(day => (
             <div key={day} className="flex items-start gap-3 p-3 border rounded-lg">
-              <div className="min-w-[120px] font-medium text-gray-700">{day}</div>
+              <div className="min-w-[120px] font-medium text-gray-700 dark:text-gray-300">{day}</div>
               <div className="flex-1 flex flex-wrap gap-2">
                 {availability[day] && availability[day].length > 0 ? (
                   availability[day].map((slot, index) => (
