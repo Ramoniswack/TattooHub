@@ -108,7 +108,7 @@ export default function DebugCustomersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <Header />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Customer Database Debug Tool</h1>
@@ -170,7 +170,7 @@ export default function DebugCustomersPage() {
               >
                 Migrate Firestore → Realtime DB
               </Button>
-              <p className="text-xs text-gray-600 mt-2">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                 This will copy all customers from Firestore to Realtime Database
               </p>
             </div>
