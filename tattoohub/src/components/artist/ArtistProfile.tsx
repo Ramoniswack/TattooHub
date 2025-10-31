@@ -31,7 +31,7 @@ export default function ArtistProfile() {
     return (
       <Card>
         <CardContent className="p-12 text-center">
-          <p className="text-gray-600">Please complete your artist profile to get started.</p>
+          <p className="text-gray-600 dark:text-gray-400">Please complete your artist profile to get started.</p>
         </CardContent>
       </Card>
     );
@@ -160,7 +160,7 @@ export default function ArtistProfile() {
                 placeholder="Tell clients about your experience and style..."
               />
             ) : (
-              <p className="text-gray-600 leading-relaxed">{user.bio || 'Not set'}</p>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{user.bio || 'Not set'}</p>
             )}
           </div>
 
@@ -224,23 +224,23 @@ export default function ArtistProfile() {
 
           {/* Statistics */}
           {!isEditing && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                   <span className="text-2xl font-bold">{user.rating || 0}</span>
                 </div>
-                <p className="text-sm text-gray-600">Rating</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Rating</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{user.totalReviews || 0}</div>
-                <p className="text-sm text-gray-600">Reviews</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Reviews</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
                   {user.approved ? 'Approved' : 'Pending'}
                 </div>
-                <p className="text-sm text-gray-600">Status</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
               </div>
             </div>
           )}
@@ -308,7 +308,7 @@ export default function ArtistProfile() {
                           </Select>
                         </>
                       ) : (
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 dark:text-gray-400">
                           {dayData[0]?.start} - {dayData[0]?.end}
                         </span>
                       )}
