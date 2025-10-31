@@ -55,7 +55,7 @@ export default function ArtistBookings() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading bookings...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading bookings...</p>
       </div>
     );
   }
@@ -96,8 +96,8 @@ export default function ArtistBookings() {
       <Card>
         <CardContent className="p-12 text-center">
           <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No bookings yet</h3>
+          <p className="text-gray-600 dark:text-gray-400">
             Bookings will appear here when customers book appointments with you.
           </p>
         </CardContent>
@@ -123,10 +123,10 @@ export default function ArtistBookings() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">
                       {customerName}
                     </h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
                       <div className="flex items-center">
                         <Mail className="h-4 w-4 mr-1" />
                         Customer ID: {customerId}
@@ -142,7 +142,7 @@ export default function ArtistBookings() {
                   <div className="text-2xl font-bold text-purple-600 mb-1">
                     ${booking.price}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {booking.duration} hours
                   </div>
                 </div>
@@ -157,14 +157,14 @@ export default function ArtistBookings() {
                     <div className="font-medium">
                       {format(parseISO(booking.date), 'PPP')}
                     </div>
-                    <div className="text-sm text-gray-600">Date</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Date</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Clock className="h-5 w-5 text-gray-400" />
                   <div>
                     <div className="font-medium">{booking.time}</div>
-                    <div className="text-sm text-gray-600">Time</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Time</div>
                   </div>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function ArtistBookings() {
                     <MessageCircle className="h-5 w-5 text-gray-400 mt-0.5" />
                     <div>
                       <div className="font-medium mb-1">Tattoo Description</div>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                         {booking.description}
                       </p>
                     </div>
