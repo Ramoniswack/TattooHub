@@ -26,7 +26,7 @@ export default function ManageBookings({ bookings, isLoading = false, onUpdate }
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading bookings...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading bookings...</p>
       </div>
     );
   }
@@ -92,10 +92,10 @@ export default function ManageBookings({ bookings, isLoading = false, onUpdate }
       </Card>
 
       <div className="grid grid-cols-4 gap-4">
-        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-teal-600">{bookings.length}</div><div className="text-sm text-gray-600">Total</div></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-yellow-600">{bookings.filter(b => b.status === 'pending').length}</div><div className="text-sm text-gray-600">Pending</div></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{bookings.filter(b => b.status === 'confirmed').length}</div><div className="text-sm text-gray-600">Confirmed</div></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-blue-600">{bookings.filter(b => b.status === 'completed').length}</div><div className="text-sm text-gray-600">Completed</div></CardContent></Card>
+        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-teal-600">{bookings.length}</div><div className="text-sm text-gray-600 dark:text-gray-400">Total</div></CardContent></Card>
+        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-yellow-600">{bookings.filter(b => b.status === 'pending').length}</div><div className="text-sm text-gray-600 dark:text-gray-400">Pending</div></CardContent></Card>
+        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{bookings.filter(b => b.status === 'confirmed').length}</div><div className="text-sm text-gray-600 dark:text-gray-400">Confirmed</div></CardContent></Card>
+        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-blue-600">{bookings.filter(b => b.status === 'completed').length}</div><div className="text-sm text-gray-600 dark:text-gray-400">Completed</div></CardContent></Card>
       </div>
 
       <div className="space-y-4">
@@ -110,13 +110,13 @@ export default function ManageBookings({ bookings, isLoading = false, onUpdate }
                     {booking.reviewed && <Badge variant="outline" className="text-xs">Reviewed</Badge>}
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="font-medium text-gray-700">Customer:</span> {booking.customerName}</div>
-                    <div><span className="font-medium text-gray-700">Artist:</span> {booking.artistName}</div>
-                    <div className="flex items-center text-gray-600"><Calendar className="h-4 w-4 mr-1" />{booking.date}</div>
-                    <div className="flex items-center text-gray-600"><Clock className="h-4 w-4 mr-1" />{booking.time} ({booking.duration}h)</div>
+                    <div><span className="font-medium text-gray-700 dark:text-gray-300">Customer:</span> {booking.customerName}</div>
+                    <div><span className="font-medium text-gray-700 dark:text-gray-300">Artist:</span> {booking.artistName}</div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400"><Calendar className="h-4 w-4 mr-1" />{booking.date}</div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-400"><Clock className="h-4 w-4 mr-1" />{booking.time} ({booking.duration}h)</div>
                     <div className="flex items-center text-teal-600 font-medium"><DollarSign className="h-4 w-4 mr-1" />${booking.price}</div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">{booking.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{booking.description}</p>
                 </div>
                 <Button size="sm" onClick={() => handleViewDetails(booking)}>
                   <Eye className="h-4 w-4 mr-1" />View
