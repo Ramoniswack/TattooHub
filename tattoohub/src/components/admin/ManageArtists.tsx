@@ -50,7 +50,7 @@ export default function ManageArtists() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading artists...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading artists...</p>
       </div>
     );
   }
@@ -103,19 +103,19 @@ export default function ManageArtists() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-teal-600">{artists.length}</div>
-            <div className="text-sm text-gray-600">Total Artists</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Artists</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600">{artists.filter(a => a.approved).length}</div>
-            <div className="text-sm text-gray-600">Approved</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Approved</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-yellow-600">{artists.filter(a => !a.approved).length}</div>
-            <div className="text-sm text-gray-600">Pending</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Pending</div>
           </CardContent>
         </Card>
       </div>
@@ -139,7 +139,7 @@ export default function ManageArtists() {
                         {artist.approved ? 'Approved' : 'Pending'}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                       <div><span className="font-medium">Email:</span> {artist.email}</div>
                       <div className="flex items-center"><MapPin className="h-4 w-4 mr-1" />{artist.location || 'N/A'}</div>
                       <div className="flex items-center"><DollarSign className="h-4 w-4 mr-1" />${artist.hourlyRate}/hr</div>
