@@ -117,7 +117,7 @@ export default function CustomerDetailModal({
             </Avatar>
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">{customer.name}</h3>
-              <div className="space-y-1 text-sm text-gray-600">
+              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   <span>{customer.email}</span>
@@ -137,24 +137,24 @@ export default function CustomerDetailModal({
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="text-center">
               <div className="text-2xl font-bold text-teal-600">{customerBookings.length}</div>
-              <div className="text-sm text-gray-600">Total Bookings</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Total Bookings</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 {customerBookings.filter(b => b.status === 'completed').length}
               </div>
-              <div className="text-sm text-gray-600">Completed</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Completed</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">{reviews.length}</div>
-              <div className="text-sm text-gray-600">Reviews</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Reviews</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">${totalSpent}</div>
-              <div className="text-sm text-gray-600">Total Spent</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Total Spent</div>
             </div>
           </div>
 
@@ -225,9 +225,9 @@ export default function CustomerDetailModal({
                             {booking.status}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           <div>{booking.date} at {booking.time}</div>
-                          <div className="font-medium text-gray-900">${booking.price}</div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">${booking.price}</div>
                         </div>
                       </div>
                     ))
@@ -251,7 +251,7 @@ export default function CustomerDetailModal({
                             <span className="font-medium">{review.rating}</span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600">{review.comment}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{review.comment}</p>
                         <p className="text-xs text-gray-400 mt-1">
                           {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recent'}
                         </p>
