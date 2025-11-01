@@ -98,7 +98,7 @@ export default function BookingDetailModal({ booking, isOpen, onClose, onUpdate 
 
         <div className="space-y-6">
           {/* Status */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="flex items-center gap-2">
               {getStatusIcon(booking.status)}
               <span className="font-medium">Status:</span>
@@ -109,45 +109,45 @@ export default function BookingDetailModal({ booking, isOpen, onClose, onUpdate 
           {/* Participants */}
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 mb-2 text-sm text-gray-600 dark:text-gray-400">
                 <User className="h-4 w-4" />
                 <span>Customer</span>
               </div>
               <div className="font-medium">{booking.customerName}</div>
-              <div className="text-sm text-gray-600">ID: {booking.customerId.substring(0, 8)}...</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">ID: {booking.customerId.substring(0, 8)}...</div>
             </div>
             <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 mb-2 text-sm text-gray-600 dark:text-gray-400">
                 <User className="h-4 w-4" />
                 <span>Artist</span>
               </div>
               <div className="font-medium">{booking.artistName}</div>
-              <div className="text-sm text-gray-600">ID: {booking.artistId.substring(0, 8)}...</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">ID: {booking.artistId.substring(0, 8)}...</div>
             </div>
           </div>
 
           {/* Booking Details */}
           <div className="space-y-3">
-            <div className="flex items-center gap-3 text-gray-700">
+            <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
               <Calendar className="h-5 w-5 text-gray-400" />
               <div>
-                <div className="text-sm text-gray-600">Date</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Date</div>
                 <div className="font-medium">{booking.date}</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-gray-700">
+            <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
               <Clock className="h-5 w-5 text-gray-400" />
               <div>
-                <div className="text-sm text-gray-600">Time & Duration</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Time & Duration</div>
                 <div className="font-medium">{booking.time} ({booking.duration} hours)</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-gray-700">
+            <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
               <DollarSign className="h-5 w-5 text-gray-400" />
               <div>
-                <div className="text-sm text-gray-600">Price</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Price</div>
                 <div className="font-medium text-lg text-teal-600">${booking.price}</div>
               </div>
             </div>
@@ -155,14 +155,14 @@ export default function BookingDetailModal({ booking, isOpen, onClose, onUpdate 
 
           {/* Description */}
           <div>
-            <div className="text-sm font-medium text-gray-700 mb-2">Description</div>
-            <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-700">
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</div>
+            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-300">
               {booking.description || 'No description provided'}
             </div>
           </div>
 
           {/* Metadata */}
-          <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-600">
+          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs text-gray-600 dark:text-gray-400">
             <div className="flex justify-between">
               <span>Booking ID:</span>
               <span className="font-mono">{booking.id}</span>
