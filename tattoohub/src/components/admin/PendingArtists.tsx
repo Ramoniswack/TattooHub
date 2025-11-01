@@ -72,7 +72,7 @@ export default function PendingArtists() {
         <CardContent>
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading pending artists...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading pending artists...</p>
           </div>
         </CardContent>
       </Card>
@@ -93,15 +93,15 @@ export default function PendingArtists() {
         {pendingArtists.length === 0 ? (
           <div className="text-center py-8">
             <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">All caught up!</h3>
-            <p className="text-gray-600">No pending artist approvals at the moment.</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">All caught up!</h3>
+            <p className="text-gray-600 dark:text-gray-400">No pending artist approvals at the moment.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {pendingArtists.map((artist) => (
               <div
                 key={artist.id}
-                className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
               >
                 <Avatar className="h-16 w-16">
                   <AvatarImage src={artist.avatar} alt={artist.name} />
@@ -112,13 +112,13 @@ export default function PendingArtists() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-gray-900 truncate">{artist.name}</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{artist.name}</h4>
                     <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
                       Pending
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <div className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
                       <span className="truncate">{artist.email}</span>
@@ -132,7 +132,7 @@ export default function PendingArtists() {
                   </div>
 
                   {artist.bio && (
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">{artist.bio}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{artist.bio}</p>
                   )}
 
                   {artist.specialties && artist.specialties.length > 0 && (
