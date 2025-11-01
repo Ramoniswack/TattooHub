@@ -52,7 +52,7 @@ export default function ManageCustomers() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading customers...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading customers...</p>
       </div>
     );
   }
@@ -77,19 +77,19 @@ export default function ManageCustomers() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-teal-600">{customers.length}</div>
-            <div className="text-sm text-gray-600">Total Customers</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Customers</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600">{bookings.length}</div>
-            <div className="text-sm text-gray-600">Total Bookings</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Bookings</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-600">${bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + b.price, 0)}</div>
-            <div className="text-sm text-gray-600">Total Revenue</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</div>
           </CardContent>
         </Card>
       </div>
@@ -110,7 +110,7 @@ export default function ManageCustomers() {
                     </Avatar>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold mb-2">{customer.name}</h3>
-                      <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                      <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center"><Mail className="h-4 w-4 mr-1" />{customer.email}</div>
                         <div className="flex items-center"><Calendar className="h-4 w-4 mr-1" />Joined {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}</div>
                         <div><span className="font-medium">{customerBookings.length}</span> bookings</div>
