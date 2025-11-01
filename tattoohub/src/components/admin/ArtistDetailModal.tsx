@@ -127,8 +127,8 @@ export default function ArtistDetailModal({ artist, isOpen, onClose, onUpdate }:
                   {artist.approved ? 'Approved' : 'Pending'}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-600">{artist.email}</p>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">{artist.email}</p>
+              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span>{artist.rating?.toFixed(1) || '0.0'}</span>
@@ -229,7 +229,7 @@ export default function ArtistDetailModal({ artist, isOpen, onClose, onUpdate }:
             <div className="space-y-4">
               <div>
                 <Label>Bio</Label>
-                <p className="text-sm text-gray-700 mt-1">{artist.bio || 'No bio provided'}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{artist.bio || 'No bio provided'}</p>
               </div>
 
               <div>
@@ -265,7 +265,7 @@ export default function ArtistDetailModal({ artist, isOpen, onClose, onUpdate }:
 
               <div>
                 <Label>Account Created</Label>
-                <p className="text-sm text-gray-700 mt-1">
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                   {artist.createdAt ? new Date(artist.createdAt).toLocaleDateString() : 'N/A'}
                 </p>
               </div>
