@@ -107,7 +107,6 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
       } else {
         // Firebase email/password signup
         // First, upload images if provided
-        setUploadingImage(true);
         let avatarUrl = '';
         let coverUrl = '';
         
@@ -130,10 +129,7 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
           console.error('Failed to upload images:', uploadError);
           setError('Failed to upload images. Please try again.');
           setIsLoading(false);
-          setUploadingImage(false);
           return;
-        } finally {
-          setUploadingImage(false);
         }
         
         // Now create the user account with image URLs
