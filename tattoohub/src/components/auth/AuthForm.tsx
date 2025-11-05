@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,7 +38,6 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
   const [currentSpecialty, setCurrentSpecialty] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
   
   const { setUser } = useAuthStore();
@@ -392,10 +392,11 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                     </div>
                     {avatarPreview && (
                       <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-slate-600">
-                        <img 
+                        <Image 
                           src={avatarPreview} 
                           alt="Avatar Preview" 
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       </div>
                     )}
@@ -417,10 +418,11 @@ export default function AuthForm({ mode, defaultRole = 'customer' }: AuthFormPro
                     />
                     {coverPreview && (
                       <div className="relative w-full h-32 rounded-lg overflow-hidden border-2 border-slate-600">
-                        <img 
+                        <Image 
                           src={coverPreview} 
                           alt="Cover Preview" 
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       </div>
                     )}

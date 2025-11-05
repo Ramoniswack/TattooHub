@@ -96,7 +96,7 @@ export async function uploadPortfolioImage(
 /**
  * Delete image (no-op for base64, kept for compatibility)
  */
-export async function deleteImage(_imageUrl: string): Promise<void> {
+export async function deleteImage(): Promise<void> {
   // Base64 images are stored in database, nothing to delete from storage
   console.log('Base64 image, no storage deletion needed');
 }

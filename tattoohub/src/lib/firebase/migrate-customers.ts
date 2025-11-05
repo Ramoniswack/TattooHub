@@ -81,5 +81,5 @@ export async function migrateCustomersToRealtimeDB(): Promise<{
 
 // Export a function that can be called from the browser console
 if (typeof window !== 'undefined') {
-  (window as any).migrateCustomers = migrateCustomersToRealtimeDB;
+  (window as { migrateCustomers?: typeof migrateCustomersToRealtimeDB }).migrateCustomers = migrateCustomersToRealtimeDB;
 }

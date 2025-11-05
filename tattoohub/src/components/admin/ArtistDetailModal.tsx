@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -250,12 +251,14 @@ export default function ArtistDetailModal({ artist, isOpen, onClose, onUpdate }:
                 <div className="grid grid-cols-3 gap-2 mt-1">
                   {artist.portfolio?.length > 0 ? (
                     artist.portfolio.map((url, idx) => (
-                      <img 
-                        key={idx} 
-                        src={url} 
-                        alt={`Portfolio ${idx + 1}`}
-                        className="w-full h-24 object-cover rounded"
-                      />
+                      <div key={idx} className="relative w-full h-24 rounded overflow-hidden">
+                        <Image 
+                          src={url} 
+                          alt={`Portfolio ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                     ))
                   ) : (
                     <p className="text-sm text-gray-500">No portfolio images</p>

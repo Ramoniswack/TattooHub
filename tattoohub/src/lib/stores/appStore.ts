@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { AppStore, Booking } from '@/types';
 import { mockArtists, mockCustomers, mockBookings } from '@/data/mockData';
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStore>((set) => ({
   artists: mockArtists,
   customers: mockCustomers,
   bookings: mockBookings,

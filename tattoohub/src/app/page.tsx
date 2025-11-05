@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, MapPin, Clock, CircleCheck as CheckCircle, Users, Calendar, Shield } from 'lucide-react';
+import { Star, MapPin, Users, Calendar, Shield } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import { mockArtists } from '@/data/mockData';
 
