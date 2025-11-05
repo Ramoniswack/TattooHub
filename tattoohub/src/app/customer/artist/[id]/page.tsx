@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -184,11 +185,12 @@ export default function ArtistDetailPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {artist.portfolio.map((image, index) => (
-                      <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                        <img
+                      <div key={index} className="aspect-square rounded-lg overflow-hidden relative">
+                        <Image
                           src={image}
                           alt={`Portfolio ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     ))}
