@@ -1,0 +1,106 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is the owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Users collection - where authentication data is stored
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles
+      allow read: if isAuthenticated();
+      
+      // Users can create their own profile during signup
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Users can update their own profile, admins can update any
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Artists collection (if separate from users)
+    match /artists/{artistId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == artistId;
+      allow update: if isOwner(artistId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Customers collection (if separate from users)
+    match /customers/{customerId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == customerId;
+      allow update: if isOwner(customerId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Admins collection - very restricted
+    match /admins/{adminId} {
+      // Only admins can read admin list
+      allow read: if isAdmin();
+      
+      // Only existing admins can create new admins
+      allow create: if isAdmin();
+      
+      // Admins cannot update or delete themselves (prevents lockout)
+      allow update, delete: if false;
+    }
+    
+    // Bookings collection
+    match /bookings/{bookingId} {
+      // Users can read bookings where they are customer or artist
+      allow read: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.artistId == request.auth.uid ||
+        isAdmin()
+      );
+      
+      // Customers can create bookings
+      allow create: if isAuthenticated() && request.resource.data.customerId == request.auth.uid;
+      
+      // Customers and artists can update their own bookings
+      allow update: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        resource.data.artistId == request.auth.uid ||
+        isAdmin()
+      );
+      
+      // Only admins can delete bookings
+      allow delete: if isAdmin();
+    }
+    
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Anyone authenticated can read reviews
+      allow read: if isAuthenticated();
+      
+      // Customers can create reviews for their completed bookings
+      allow create: if isAuthenticated() && request.resource.data.customerId == request.auth.uid;
+      
+      // Users can update their own reviews
+      allow update: if isAuthenticated() && resource.data.customerId == request.auth.uid;
+      
+      // Users can delete their own reviews, admins can delete any
+      allow delete: if isAuthenticated() && (
+        resource.data.customerId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+  }
+}
