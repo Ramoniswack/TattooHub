@@ -10,8 +10,8 @@ import { Customer } from '@/types';
 import Header from '@/components/layout/Header';
 
 export default function DebugCustomersPage() {
-  const [firestoreCustomers, setFirestoreCustomers] = useState<any[]>([]);
-  const [realtimeCustomers, setRealtimeCustomers] = useState<any[]>([]);
+  const [firestoreCustomers, setFirestoreCustomers] = useState<Customer[]>([]);
+  const [realtimeCustomers, setRealtimeCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -22,8 +22,8 @@ export default function DebugCustomersPage() {
       
       const usersSnapshot = await getDocs(collection(db, 'users'));
       const customers = usersSnapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .filter((user: any) => user.role === 'customer');
+        .map(doc => ({ id: doc.id, ...doc.data() } as Customer))
+        .filter((user) => user.role === 'customer');
       
       setFirestoreCustomers(customers);
       setMessage(`Found ${customers.length} customers in Firestore`);
@@ -49,7 +49,7 @@ export default function DebugCustomersPage() {
         return;
       }
 
-      const customers: any[] = [];
+      const customers: Customer[] = [];
       snapshot.forEach((childSnapshot) => {
         customers.push({ id: childSnapshot.key, ...childSnapshot.val() });
       });
@@ -78,7 +78,7 @@ export default function DebugCustomersPage() {
             name: customer.name,
             role: 'customer',
             avatar: customer.avatar,
-            createdAt: customer.createdAt?.toDate ? customer.createdAt.toDate() : new Date(),
+            createdAt: customer.createdAt instanceof Date ? customer.createdAt : new Date(),
             ...(customer.phone && { phone: customer.phone }),
           };
 
