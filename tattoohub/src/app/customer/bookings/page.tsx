@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,7 +17,7 @@ import { format, parseISO } from 'date-fns';
 import ReviewModal from '@/components/ReviewModal';
 import EditBookingModal from '@/components/customer/EditBookingModal';
 
-export default function BookingsPage() {
+function BookingsContent() {
   const searchParams = useSearchParams();
   const success = searchParams?.get('success');
   const [showSuccess, setShowSuccess] = useState(false);
@@ -386,5 +386,13 @@ export default function BookingsPage() {
         onUpdate={refreshBookings}
       />
     </div>
+  );
+}
+
+export default function BookingsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-gray-900"><Header /><div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"><p>Loading bookings...</p></div></div>}>
+      <BookingsContent />
+    </Suspense>
   );
 }
