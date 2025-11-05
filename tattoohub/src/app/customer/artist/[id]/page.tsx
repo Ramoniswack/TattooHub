@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Star, MapPin, DollarSign, Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { Star, MapPin, DollarSign, Clock, ArrowLeft } from 'lucide-react';
 import { getArtistById } from '@/lib/firebase/database';
 import { Artist } from '@/types';
 import Header from '@/components/layout/Header';
