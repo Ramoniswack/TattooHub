@@ -352,7 +352,9 @@ export const mockBookings: Booking[] = [
   {
     id: '1',
     customerId: '13',
+    customerName: 'Sarah Johnson',
     artistId: '1',
+    artistName: 'Mike Ross',
     date: '2024-03-15',
     time: '14:00',
     duration: 2,
@@ -364,7 +366,9 @@ export const mockBookings: Booking[] = [
   {
     id: '2',
     customerId: '14',
+    customerName: 'Jessica Lee',
     artistId: '2',
+    artistName: 'Sarah Chen',
     date: '2024-03-20',
     time: '16:00',
     duration: 3,
